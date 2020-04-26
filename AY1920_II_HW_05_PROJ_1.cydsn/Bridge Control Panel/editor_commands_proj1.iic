@@ -1,0 +1,5 @@
+;--------------rx8 packet structure----------------
+;byte 1: header=0xA0
+;data: byte 2: temp LSB, byte 3: temp MSB
+;byte 4: tail=0xC0
+rx8 [h=A0] @0temp @1temp [t=C0]
