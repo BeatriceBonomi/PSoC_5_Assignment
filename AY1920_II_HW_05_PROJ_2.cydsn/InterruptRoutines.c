@@ -22,6 +22,9 @@ int16_t Accelerations_mg[DATA_BYTES_NUMBER/2];
 /*Flag to start UART transmission in main*/
 volatile uint8_t PacketReadyFlag = 0; 
 
+/* Array of bytes to be trasmitted */
+uint8_t DataBuffer[TRANSMIT_BUFFER_SIZE]; 
+
 /*
 * \brief for each axis, starting from left-adjusted LSB and MSB, create a right-justified 16-bit integer corresponding to the acceleration in mg
 */
@@ -32,14 +35,25 @@ void Data_Conversion(void) {
     for(i = 0; i < DATA_BYTES_NUMBER/2; i++) {
         
         /* right shift of 4 = right shift of 6 to get right-justified 10 bits + left shift of 2 to multiply by 4 and get the value in mg */
-        Accelerations_mg[i] = (int16)((AccelerometerData[i*2] | (AccelerometerData[i*2+1]<<8)))>>4;
+        Accelerations_mg[i] = (int16)((AccelerometerData[i*2] | (AccelerometerData[i*2+1] << 8))) >> 4;
         
     }
 
 }
-
+/* 
+* \brief for each axis, put LSB and MSB of the acceleration value in mg in the correct position of the packet to be sent 
+*/
 void Packet_Preparation(void) {
-    //to define
+    
+    uint8_t i;
+    
+    for(i = 0; i<DATA_BYTES_NUMBER/2; i++) {
+        
+        DataBuffer[i*2+1] = Accelerations_mg[i] & 0xFF;
+        DataBuffer[i*2+2] = Accelerations_mg[i] >> 8;
+        
+    }
+        
 }
 
 /*
