@@ -6,7 +6,7 @@
 
 /* Include header files */
 #include "I2C_Interface.h"
-#include "project.h"
+#include "InterruptRoutines.h"
 #include "stdio.h"
 #include "registers.h"
 
@@ -14,15 +14,21 @@
 int main(void)
 {
     CyGlobalIntEnable; /* Enable global interrupts. */
-
+    
+    /*start components through API */
     I2C_Peripheral_Start();
     UART_Debug_Start();
+    Timer_Start();
+
+    /* associate the interrupt to the correct ISR vector */
+    Timer_isr_StartEx(Custom_TIMER_ISR);
     
     CyDelay(5); /* "The boot procedure is complete about 5 milliseconds after device power-up." */
     
     /* String to print out messages on the UART */
     char message[50];
     
+    /* variable to check error in I2C communication */
     ErrorCode error;
 
     /* Check which devices are present on the I2C bus */
@@ -78,7 +84,7 @@ int main(void)
         }
     
     
-        /* Read Control Register 1 again to check for correct writing    */
+        /* Read Control Register 1 again to check for correct writing */
         error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
                                             CTRL_REG_1_ADDR,
                                             &ctrl_reg1);
@@ -132,7 +138,7 @@ int main(void)
         }
     
     
-        /* Read Control Register 4 again to check for correct writing    */
+        /* Read Control Register 4 again to check for correct writing */
         error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
                                             CTRL_REG_4_ADDR,
                                             &ctrl_reg4);

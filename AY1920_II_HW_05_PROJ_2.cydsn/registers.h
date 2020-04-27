@@ -11,7 +11,7 @@
     /*address of the LIS3DH slave device */
     #define LIS3DH_DEVICE_ADDRESS 0x18
     
-    /* STATUS_REGISTER (READ ONLY): bit 3 (ZYXDA) will be read to check if new data are available for all 3 axis */
+    /* STATUS_REGISTER (READ ONLY): bit 3 (ZYXDA) is read in the TIMER_ISR to check if new data are available for all 3 axis */
     #define STATUS_REG_ADDR 0x27 
     
     /* OUT LOW AND HIGH REGISTERS (READ ONLY) contain, for each axis, the 10 bit output expressed as two's complement left-justified */
