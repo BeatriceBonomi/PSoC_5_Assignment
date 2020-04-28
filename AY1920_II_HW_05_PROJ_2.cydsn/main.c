@@ -18,10 +18,6 @@ int main(void)
     /*start components through API */
     I2C_Peripheral_Start();
     UART_Debug_Start();
-    Timer_Start();
-
-    /* associate the interrupt to the correct ISR vector */
-    Timer_isr_StartEx(Custom_TIMER_ISR);
     
     CyDelay(5); /* "The boot procedure is complete about 5 milliseconds after device power-up." */
     
@@ -153,11 +149,27 @@ int main(void)
             UART_Debug_PutString("Error occurred during I2C comm to read control register 4\r\n");   
         }
     }
-
     
+    /* set up header and tail */
+    DataBuffer[0] = 0xA0;
+    DataBuffer[TRANSMIT_BUFFER_SIZE-1] = 0xC0;
+    
+    
+    Timer_Start();
+
+    /* associate the interrupt to the correct ISR vector */
+    Timer_isr_StartEx(Custom_TIMER_ISR);
+    
+    /* check continuously if a packet is ready to be transmitted 
+    *  since DataBuffer content is modified by the ISR, time between 2 interrupts must be enough to complete the packet trasmission 
+    *  see TopDesign for the baudrate choice
+    */
     for(;;)
     {
-
+        if (PacketReadyFlag) {
+            UART_Debug_PutArray(DataBuffer, TRANSMIT_BUFFER_SIZE); /*API to transmit an array of bytes */
+            PacketReadyFlag = 0;
+        }
     }
 }
 

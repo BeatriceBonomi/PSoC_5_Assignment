@@ -40,6 +40,7 @@ void Data_Conversion(void) {
     }
 
 }
+
 /* 
 * \brief for each axis, put LSB and MSB of the acceleration value in mg in the correct position of the packet to be sent 
 */
@@ -66,6 +67,8 @@ void Packet_Preparation(void) {
 */
 CY_ISR(Custom_TIMER_ISR) {
     
+    Timer_ReadStatusRegister();
+    
     uint8_t status_reg;
     ErrorCode error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
                                                   STATUS_REG_ADDR,
@@ -83,6 +86,6 @@ CY_ISR(Custom_TIMER_ISR) {
                 PacketReadyFlag = 1;
             }
         }
-    }   
+    }  
 }
 /* [] END OF FILE */
