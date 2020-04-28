@@ -1,0 +1,1401 @@
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m3
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 1
+  11              		.eabi_attribute 34, 1
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"InterruptRoutines.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.global	__aeabi_i2f
+  20              		.global	__aeabi_f2d
+  21              		.global	__aeabi_dmul
+  22              		.global	__aeabi_d2f
+  23              		.section	.text.Data_Conversion,"ax",%progbits
+  24              		.align	2
+  25              		.global	Data_Conversion
+  26              		.thumb
+  27              		.thumb_func
+  28              		.type	Data_Conversion, %function
+  29              	Data_Conversion:
+  30              	.LFB63:
+  31              		.file 1 "InterruptRoutines.c"
+   1:InterruptRoutines.c **** /* 
+   2:InterruptRoutines.c **** * \file InterruptRoutines.c
+   3:InterruptRoutines.c **** */
+   4:InterruptRoutines.c **** 
+   5:InterruptRoutines.c **** /* Include header files */
+   6:InterruptRoutines.c **** #include "InterruptRoutines.h"
+   7:InterruptRoutines.c **** #include "registers.h"
+   8:InterruptRoutines.c **** 
+   9:InterruptRoutines.c **** /* mask for bit 3 of the status register that is set when new data are available on all 3 axis */
+  10:InterruptRoutines.c **** #define STATUS_REG_MASK 0x08 
+  11:InterruptRoutines.c **** 
+  12:InterruptRoutines.c **** /* number of bytes of data read from the slave device: LSB and MSB of X,Y and Z axis acceleration *
+  13:InterruptRoutines.c **** #define DATA_BYTES_NUMBER 6
+  14:InterruptRoutines.c **** 
+  15:InterruptRoutines.c **** /* Sensitivity in the case of 12-bit resolution and ±4g FSR : 2 mg/digit (from the accelerometer d
+  16:InterruptRoutines.c **** #define SENSITIVITY 2
+  17:InterruptRoutines.c **** 
+  18:InterruptRoutines.c **** /* Conversion factor from acceleration in mg to acceleration in m/s^2 */
+  19:InterruptRoutines.c **** #define CONVERSION_FACTOR_MG_TO_MS2 0.00981
+  20:InterruptRoutines.c **** 
+  21:InterruptRoutines.c **** 
+  22:InterruptRoutines.c **** /* array to store accelerometer output data (starting from the position zero: LSB and MSB of X,Y an
+  23:InterruptRoutines.c **** uint8_t AccelerometerData[DATA_BYTES_NUMBER];
+  24:InterruptRoutines.c **** 
+  25:InterruptRoutines.c **** /* array to store the 3 accelerations in digit(from the position zero: X axis, Y axis, Z axis) */
+  26:InterruptRoutines.c **** int16_t Accelerations_digit[DATA_BYTES_NUMBER/2];
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 2
+
+
+  27:InterruptRoutines.c **** 
+  28:InterruptRoutines.c **** /* array to store the 3 accelerations in mg (from the position zero: X axis, Y axis, Z axis) */
+  29:InterruptRoutines.c **** int16_t Accelerations_mg[DATA_BYTES_NUMBER/2];
+  30:InterruptRoutines.c **** 
+  31:InterruptRoutines.c **** /* array to store the 3 accelerations in m/s^2 (from the position zero: X axis, Y axis, Z axis) */
+  32:InterruptRoutines.c **** float Accelerations_ms2[DATA_BYTES_NUMBER/2];
+  33:InterruptRoutines.c **** 
+  34:InterruptRoutines.c **** /* array to store the 3 accelerations in m/s^2 casted to int(from the position zero: X axis, Y axis
+  35:InterruptRoutines.c **** int32_t Accelerations_ms2_int[DATA_BYTES_NUMBER/2];
+  36:InterruptRoutines.c **** 
+  37:InterruptRoutines.c **** /*Flag to start UART transmission in main*/
+  38:InterruptRoutines.c **** volatile uint8_t PacketReadyFlag = 0; 
+  39:InterruptRoutines.c **** 
+  40:InterruptRoutines.c **** /* Array of bytes to be trasmitted */
+  41:InterruptRoutines.c **** uint8_t DataBuffer[TRANSMIT_BUFFER_SIZE]; 
+  42:InterruptRoutines.c **** 
+  43:InterruptRoutines.c **** /*
+  44:InterruptRoutines.c **** * \brief for each axis, starting from left-adjusted LSB and MSB:
+  45:InterruptRoutines.c **** * \-create a right-justified 16-bit integer corresponding to the acceleration in digit
+  46:InterruptRoutines.c **** * \-convert the acceleration in digit to acceleration in mg
+  47:InterruptRoutines.c **** * \-convert the acceleration in mg to acceleration in m/s^2
+  48:InterruptRoutines.c **** */
+  49:InterruptRoutines.c **** void Data_Conversion(void) {
+  32              		.loc 1 49 0
+  33              		.cfi_startproc
+  34              		@ args = 0, pretend = 0, frame = 0
+  35              		@ frame_needed = 0, uses_anonymous_args = 0
+  36 0000 10B5     		push	{r4, lr}
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 4, -8
+  39              		.cfi_offset 14, -4
+  40              	.LVL0:
+  50:InterruptRoutines.c ****     
+  51:InterruptRoutines.c ****     uint8_t i;
+  52:InterruptRoutines.c ****     
+  53:InterruptRoutines.c ****     for(i = 0; i < DATA_BYTES_NUMBER/2; i++) {
+  41              		.loc 1 53 0
+  42 0002 0024     		movs	r4, #0
+  43 0004 20E0     		b	.L2
+  44              	.LVL1:
+  45              	.L3:
+  54:InterruptRoutines.c ****         
+  55:InterruptRoutines.c ****         /* right shift of 4 to get right-justified 12 bits */
+  56:InterruptRoutines.c ****         Accelerations_digit[i] = (int16)((AccelerometerData[i*2] | (AccelerometerData[i*2+1] << 8))
+  46              		.loc 1 56 0 discriminator 3
+  47 0006 6200     		lsls	r2, r4, #1
+  48 0008 1349     		ldr	r1, .L5+8
+  49 000a 11F81430 		ldrb	r3, [r1, r4, lsl #1]	@ zero_extendqisi2
+  50 000e 0132     		adds	r2, r2, #1
+  51 0010 885C     		ldrb	r0, [r1, r2]	@ zero_extendqisi2
+  52 0012 43EA0020 		orr	r0, r3, r0, lsl #8
+  53 0016 40F30B10 		sbfx	r0, r0, #4, #12
+  54 001a 104B     		ldr	r3, .L5+12
+  55 001c 23F81400 		strh	r0, [r3, r4, lsl #1]	@ movhi
+  57:InterruptRoutines.c ****         /* multiply by the sensitivity to get the value in mg */
+  58:InterruptRoutines.c ****         Accelerations_mg[i] = Accelerations_digit[i] * SENSITIVITY;
+  56              		.loc 1 58 0 discriminator 3
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 3
+
+
+  57 0020 4000     		lsls	r0, r0, #1
+  58 0022 0F4B     		ldr	r3, .L5+16
+  59 0024 23F81400 		strh	r0, [r3, r4, lsl #1]	@ movhi
+  59:InterruptRoutines.c ****         /* convert the value in mg in m/s^2 */
+  60:InterruptRoutines.c ****         Accelerations_ms2[i] = ((float) Accelerations_mg[i]) * CONVERSION_FACTOR_MG_TO_MS2;
+  60              		.loc 1 60 0 discriminator 3
+  61 0028 FFF7FEFF 		bl	__aeabi_i2f
+  62              	.LVL2:
+  63 002c FFF7FEFF 		bl	__aeabi_f2d
+  64              	.LVL3:
+  65 0030 07A3     		adr	r3, .L5
+  66 0032 D3E90023 		ldrd	r2, [r3]
+  67 0036 FFF7FEFF 		bl	__aeabi_dmul
+  68              	.LVL4:
+  69 003a FFF7FEFF 		bl	__aeabi_d2f
+  70              	.LVL5:
+  71 003e 094B     		ldr	r3, .L5+20
+  72 0040 43F82400 		str	r0, [r3, r4, lsl #2]	@ float
+  53:InterruptRoutines.c ****         
+  73              		.loc 1 53 0 discriminator 3
+  74 0044 0134     		adds	r4, r4, #1
+  75              	.LVL6:
+  76 0046 E4B2     		uxtb	r4, r4
+  77              	.LVL7:
+  78              	.L2:
+  53:InterruptRoutines.c ****         
+  79              		.loc 1 53 0 is_stmt 0 discriminator 1
+  80 0048 022C     		cmp	r4, #2
+  81 004a DCD9     		bls	.L3
+  61:InterruptRoutines.c ****     }
+  62:InterruptRoutines.c **** 
+  63:InterruptRoutines.c **** }
+  82              		.loc 1 63 0 is_stmt 1
+  83 004c 10BD     		pop	{r4, pc}
+  84              	.LVL8:
+  85              	.L6:
+  86 004e 00BF     		.align	3
+  87              	.L5:
+  88 0050 48DC63E9 		.word	-379331512
+  89 0054 4317843F 		.word	1065621315
+  90 0058 00000000 		.word	AccelerometerData
+  91 005c 00000000 		.word	Accelerations_digit
+  92 0060 00000000 		.word	Accelerations_mg
+  93 0064 00000000 		.word	Accelerations_ms2
+  94              		.cfi_endproc
+  95              	.LFE63:
+  96              		.size	Data_Conversion, .-Data_Conversion
+  97              		.global	__aeabi_d2iz
+  98              		.section	.text.Packet_Preparation,"ax",%progbits
+  99              		.align	2
+ 100              		.global	Packet_Preparation
+ 101              		.thumb
+ 102              		.thumb_func
+ 103              		.type	Packet_Preparation, %function
+ 104              	Packet_Preparation:
+ 105              	.LFB64:
+  64:InterruptRoutines.c **** 
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 4
+
+
+  65:InterruptRoutines.c **** /* 
+  66:InterruptRoutines.c **** * \brief for each axis, starting from the acceleration in m/s^2:
+  67:InterruptRoutines.c **** * \-cast to int32 after multiplying by 1000 to keep the first 3 decimals
+  68:InterruptRoutines.c **** * \-put the 4 bytes of the int32 in the correct position of the packet to be sent 
+  69:InterruptRoutines.c **** */
+  70:InterruptRoutines.c **** void Packet_Preparation(void) {
+ 106              		.loc 1 70 0
+ 107              		.cfi_startproc
+ 108              		@ args = 0, pretend = 0, frame = 0
+ 109              		@ frame_needed = 0, uses_anonymous_args = 0
+ 110 0000 38B5     		push	{r3, r4, r5, lr}
+ 111              		.cfi_def_cfa_offset 16
+ 112              		.cfi_offset 3, -16
+ 113              		.cfi_offset 4, -12
+ 114              		.cfi_offset 5, -8
+ 115              		.cfi_offset 14, -4
+ 116              	.LVL9:
+  71:InterruptRoutines.c ****     
+  72:InterruptRoutines.c ****     uint8_t i;
+  73:InterruptRoutines.c ****     
+  74:InterruptRoutines.c ****     for(i = 0; i<DATA_BYTES_NUMBER/2; i++) {
+ 117              		.loc 1 74 0
+ 118 0002 0024     		movs	r4, #0
+ 119 0004 1CE0     		b	.L8
+ 120              	.LVL10:
+ 121              	.L9:
+  75:InterruptRoutines.c ****         
+  76:InterruptRoutines.c ****         Accelerations_ms2_int[i] = (Accelerations_ms2[i] * 1000.0);
+ 122              		.loc 1 76 0 discriminator 3
+ 123 0006 104B     		ldr	r3, .L11
+ 124 0008 53F82400 		ldr	r0, [r3, r4, lsl #2]	@ float
+ 125 000c FFF7FEFF 		bl	__aeabi_f2d
+ 126              	.LVL11:
+ 127 0010 0022     		movs	r2, #0
+ 128 0012 0E4B     		ldr	r3, .L11+4
+ 129 0014 FFF7FEFF 		bl	__aeabi_dmul
+ 130              	.LVL12:
+ 131 0018 FFF7FEFF 		bl	__aeabi_d2iz
+ 132              	.LVL13:
+ 133 001c 0C4B     		ldr	r3, .L11+8
+ 134 001e 43F82400 		str	r0, [r3, r4, lsl #2]
+  77:InterruptRoutines.c ****         DataBuffer[i*4+1] = Accelerations_ms2_int[i] & 0xFF; /*LSB */
+ 135              		.loc 1 77 0 discriminator 3
+ 136 0022 A300     		lsls	r3, r4, #2
+ 137 0024 591C     		adds	r1, r3, #1
+ 138 0026 0B4A     		ldr	r2, .L11+12
+ 139 0028 5054     		strb	r0, [r2, r1]
+  78:InterruptRoutines.c ****         DataBuffer[i*4+2] = (Accelerations_ms2_int[i] >> 8) & 0xFF; /* Second byte */
+ 140              		.loc 1 78 0 discriminator 3
+ 141 002a 991C     		adds	r1, r3, #2
+ 142 002c 0512     		asrs	r5, r0, #8
+ 143 002e 5554     		strb	r5, [r2, r1]
+  79:InterruptRoutines.c ****         DataBuffer[i*4+3] = (Accelerations_ms2_int[i] >> 16) & 0xFF; /* Third byte */
+ 144              		.loc 1 79 0 discriminator 3
+ 145 0030 0333     		adds	r3, r3, #3
+ 146 0032 0114     		asrs	r1, r0, #16
+ 147 0034 D154     		strb	r1, [r2, r3]
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 5
+
+
+  80:InterruptRoutines.c ****         DataBuffer[i*4+4] = (Accelerations_ms2_int[i] >> 24); /* MSB */        
+ 148              		.loc 1 80 0 discriminator 3
+ 149 0036 0134     		adds	r4, r4, #1
+ 150              	.LVL14:
+ 151 0038 0016     		asrs	r0, r0, #24
+ 152 003a 02F82400 		strb	r0, [r2, r4, lsl #2]
+  74:InterruptRoutines.c ****         
+ 153              		.loc 1 74 0 discriminator 3
+ 154 003e E4B2     		uxtb	r4, r4
+ 155              	.LVL15:
+ 156              	.L8:
+  74:InterruptRoutines.c ****         
+ 157              		.loc 1 74 0 is_stmt 0 discriminator 1
+ 158 0040 022C     		cmp	r4, #2
+ 159 0042 E0D9     		bls	.L9
+  81:InterruptRoutines.c ****     }
+  82:InterruptRoutines.c ****     
+  83:InterruptRoutines.c **** }
+ 160              		.loc 1 83 0 is_stmt 1
+ 161 0044 38BD     		pop	{r3, r4, r5, pc}
+ 162              	.LVL16:
+ 163              	.L12:
+ 164 0046 00BF     		.align	2
+ 165              	.L11:
+ 166 0048 00000000 		.word	Accelerations_ms2
+ 167 004c 00408F40 		.word	1083129856
+ 168 0050 00000000 		.word	Accelerations_ms2_int
+ 169 0054 00000000 		.word	DataBuffer
+ 170              		.cfi_endproc
+ 171              	.LFE64:
+ 172              		.size	Packet_Preparation, .-Packet_Preparation
+ 173              		.section	.text.Custom_TIMER_ISR,"ax",%progbits
+ 174              		.align	2
+ 175              		.global	Custom_TIMER_ISR
+ 176              		.thumb
+ 177              		.thumb_func
+ 178              		.type	Custom_TIMER_ISR, %function
+ 179              	Custom_TIMER_ISR:
+ 180              	.LFB65:
+  84:InterruptRoutines.c **** 
+  85:InterruptRoutines.c **** /*
+  86:InterruptRoutines.c **** * \brief ISR on TC (every 10 ms):
+  87:InterruptRoutines.c **** * \read the status register
+  88:InterruptRoutines.c **** * \if bit 3 is set, read output data of all axis
+  89:InterruptRoutines.c **** * \convert the data
+  90:InterruptRoutines.c **** * \prepare the packet
+  91:InterruptRoutines.c **** * \rise the flag to send the packet 
+  92:InterruptRoutines.c **** */
+  93:InterruptRoutines.c **** CY_ISR(Custom_TIMER_ISR) {
+ 181              		.loc 1 93 0
+ 182              		.cfi_startproc
+ 183              		@ args = 0, pretend = 0, frame = 8
+ 184              		@ frame_needed = 0, uses_anonymous_args = 0
+ 185 0000 00B5     		push	{lr}
+ 186              		.cfi_def_cfa_offset 4
+ 187              		.cfi_offset 14, -4
+ 188 0002 83B0     		sub	sp, sp, #12
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 6
+
+
+ 189              		.cfi_def_cfa_offset 16
+  94:InterruptRoutines.c ****     
+  95:InterruptRoutines.c ****     Timer_ReadStatusRegister();
+ 190              		.loc 1 95 0
+ 191 0004 FFF7FEFF 		bl	Timer_ReadStatusRegister
+ 192              	.LVL17:
+  96:InterruptRoutines.c ****     
+  97:InterruptRoutines.c ****     uint8_t status_reg;
+  98:InterruptRoutines.c ****     ErrorCode error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 193              		.loc 1 98 0
+ 194 0008 0DF10702 		add	r2, sp, #7
+ 195 000c 2721     		movs	r1, #39
+ 196 000e 1820     		movs	r0, #24
+ 197 0010 FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
+ 198              	.LVL18:
+  99:InterruptRoutines.c ****                                                   STATUS_REG_ADDR,
+ 100:InterruptRoutines.c ****                                                   &status_reg);
+ 101:InterruptRoutines.c ****     if (error == NO_ERROR) {
+ 199              		.loc 1 101 0
+ 200 0014 90B9     		cbnz	r0, .L13
+ 102:InterruptRoutines.c ****         if (status_reg & STATUS_REG_MASK) {
+ 201              		.loc 1 102 0
+ 202 0016 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 203 001a 13F0080F 		tst	r3, #8
+ 204 001e 0DD0     		beq	.L13
+ 103:InterruptRoutines.c ****         
+ 104:InterruptRoutines.c ****             error = I2C_Peripheral_ReadRegisterMulti( LIS3DH_DEVICE_ADDRESS,
+ 205              		.loc 1 104 0
+ 206 0020 084B     		ldr	r3, .L16
+ 207 0022 0622     		movs	r2, #6
+ 208 0024 2821     		movs	r1, #40
+ 209 0026 1820     		movs	r0, #24
+ 210              	.LVL19:
+ 211 0028 FFF7FEFF 		bl	I2C_Peripheral_ReadRegisterMulti
+ 212              	.LVL20:
+ 105:InterruptRoutines.c ****                                                       OUT_X_L_ADDR,
+ 106:InterruptRoutines.c ****                                                       6,
+ 107:InterruptRoutines.c ****                                                       AccelerometerData);
+ 108:InterruptRoutines.c ****             if (error == NO_ERROR) {
+ 213              		.loc 1 108 0
+ 214 002c 30B9     		cbnz	r0, .L13
+ 109:InterruptRoutines.c ****                 Data_Conversion();
+ 215              		.loc 1 109 0
+ 216 002e FFF7FEFF 		bl	Data_Conversion
+ 217              	.LVL21:
+ 110:InterruptRoutines.c ****                 Packet_Preparation();
+ 218              		.loc 1 110 0
+ 219 0032 FFF7FEFF 		bl	Packet_Preparation
+ 220              	.LVL22:
+ 111:InterruptRoutines.c ****                 PacketReadyFlag = 1;
+ 221              		.loc 1 111 0
+ 222 0036 0122     		movs	r2, #1
+ 223 0038 034B     		ldr	r3, .L16+4
+ 224 003a 1A70     		strb	r2, [r3]
+ 225              	.L13:
+ 112:InterruptRoutines.c ****             }
+ 113:InterruptRoutines.c ****         }
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 7
+
+
+ 114:InterruptRoutines.c ****     }   
+ 115:InterruptRoutines.c **** }
+ 226              		.loc 1 115 0
+ 227 003c 03B0     		add	sp, sp, #12
+ 228              		.cfi_def_cfa_offset 4
+ 229              		@ sp needed
+ 230 003e 5DF804FB 		ldr	pc, [sp], #4
+ 231              	.L17:
+ 232 0042 00BF     		.align	2
+ 233              	.L16:
+ 234 0044 00000000 		.word	AccelerometerData
+ 235 0048 00000000 		.word	.LANCHOR0
+ 236              		.cfi_endproc
+ 237              	.LFE65:
+ 238              		.size	Custom_TIMER_ISR, .-Custom_TIMER_ISR
+ 239              		.comm	DataBuffer,14,4
+ 240              		.global	PacketReadyFlag
+ 241              		.comm	Accelerations_ms2_int,12,4
+ 242              		.comm	Accelerations_ms2,12,4
+ 243              		.comm	Accelerations_mg,6,4
+ 244              		.comm	Accelerations_digit,6,4
+ 245              		.comm	AccelerometerData,6,4
+ 246              		.bss
+ 247              		.set	.LANCHOR0,. + 0
+ 248              		.type	PacketReadyFlag, %object
+ 249              		.size	PacketReadyFlag, 1
+ 250              	PacketReadyFlag:
+ 251 0000 00       		.space	1
+ 252              		.text
+ 253              	.Letext0:
+ 254              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 255              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 256              		.file 4 "Generated_Source\\PSoC5/cytypes.h"
+ 257              		.file 5 "ErrorCodes.h"
+ 258              		.file 6 "Generated_Source\\PSoC5/core_cm3.h"
+ 259              		.file 7 "Generated_Source\\PSoC5/Timer.h"
+ 260              		.file 8 "I2C_Interface.h"
+ 261              		.section	.debug_info,"",%progbits
+ 262              	.Ldebug_info0:
+ 263 0000 D5020000 		.4byte	0x2d5
+ 264 0004 0400     		.2byte	0x4
+ 265 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 266 000a 04       		.byte	0x4
+ 267 000b 01       		.uleb128 0x1
+ 268 000c 9D000000 		.4byte	.LASF40
+ 269 0010 0C       		.byte	0xc
+ 270 0011 1F030000 		.4byte	.LASF41
+ 271 0015 DB010000 		.4byte	.LASF42
+ 272 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 273 001d 00000000 		.4byte	0
+ 274 0021 00000000 		.4byte	.Ldebug_line0
+ 275 0025 02       		.uleb128 0x2
+ 276 0026 01       		.byte	0x1
+ 277 0027 06       		.byte	0x6
+ 278 0028 13030000 		.4byte	.LASF0
+ 279 002c 03       		.uleb128 0x3
+ 280 002d 00000000 		.4byte	.LASF2
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 8
+
+
+ 281 0031 02       		.byte	0x2
+ 282 0032 1D       		.byte	0x1d
+ 283 0033 37000000 		.4byte	0x37
+ 284 0037 02       		.uleb128 0x2
+ 285 0038 01       		.byte	0x1
+ 286 0039 08       		.byte	0x8
+ 287 003a 8F000000 		.4byte	.LASF1
+ 288 003e 03       		.uleb128 0x3
+ 289 003f 15000000 		.4byte	.LASF3
+ 290 0043 02       		.byte	0x2
+ 291 0044 29       		.byte	0x29
+ 292 0045 49000000 		.4byte	0x49
+ 293 0049 02       		.uleb128 0x2
+ 294 004a 02       		.byte	0x2
+ 295 004b 05       		.byte	0x5
+ 296 004c A9020000 		.4byte	.LASF4
+ 297 0050 02       		.uleb128 0x2
+ 298 0051 02       		.byte	0x2
+ 299 0052 07       		.byte	0x7
+ 300 0053 43010000 		.4byte	.LASF5
+ 301 0057 03       		.uleb128 0x3
+ 302 0058 1F000000 		.4byte	.LASF6
+ 303 005c 02       		.byte	0x2
+ 304 005d 3F       		.byte	0x3f
+ 305 005e 62000000 		.4byte	0x62
+ 306 0062 02       		.uleb128 0x2
+ 307 0063 04       		.byte	0x4
+ 308 0064 05       		.byte	0x5
+ 309 0065 56010000 		.4byte	.LASF7
+ 310 0069 02       		.uleb128 0x2
+ 311 006a 04       		.byte	0x4
+ 312 006b 07       		.byte	0x7
+ 313 006c 31010000 		.4byte	.LASF8
+ 314 0070 02       		.uleb128 0x2
+ 315 0071 08       		.byte	0x8
+ 316 0072 05       		.byte	0x5
+ 317 0073 7A020000 		.4byte	.LASF9
+ 318 0077 02       		.uleb128 0x2
+ 319 0078 08       		.byte	0x8
+ 320 0079 07       		.byte	0x7
+ 321 007a BC010000 		.4byte	.LASF10
+ 322 007e 04       		.uleb128 0x4
+ 323 007f 04       		.byte	0x4
+ 324 0080 05       		.byte	0x5
+ 325 0081 696E7400 		.ascii	"int\000"
+ 326 0085 02       		.uleb128 0x2
+ 327 0086 04       		.byte	0x4
+ 328 0087 07       		.byte	0x7
+ 329 0088 9D010000 		.4byte	.LASF11
+ 330 008c 03       		.uleb128 0x3
+ 331 008d D3010000 		.4byte	.LASF12
+ 332 0091 03       		.byte	0x3
+ 333 0092 18       		.byte	0x18
+ 334 0093 2C000000 		.4byte	0x2c
+ 335 0097 03       		.uleb128 0x3
+ 336 0098 5B020000 		.4byte	.LASF13
+ 337 009c 03       		.byte	0x3
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 9
+
+
+ 338 009d 20       		.byte	0x20
+ 339 009e 3E000000 		.4byte	0x3e
+ 340 00a2 03       		.uleb128 0x3
+ 341 00a3 63020000 		.4byte	.LASF14
+ 342 00a7 03       		.byte	0x3
+ 343 00a8 2C       		.byte	0x2c
+ 344 00a9 57000000 		.4byte	0x57
+ 345 00ad 05       		.uleb128 0x5
+ 346 00ae 2B010000 		.4byte	.LASF15
+ 347 00b2 04       		.byte	0x4
+ 348 00b3 E801     		.2byte	0x1e8
+ 349 00b5 49000000 		.4byte	0x49
+ 350 00b9 02       		.uleb128 0x2
+ 351 00ba 04       		.byte	0x4
+ 352 00bb 04       		.byte	0x4
+ 353 00bc 78000000 		.4byte	.LASF16
+ 354 00c0 02       		.uleb128 0x2
+ 355 00c1 08       		.byte	0x8
+ 356 00c2 04       		.byte	0x4
+ 357 00c3 5E000000 		.4byte	.LASF17
+ 358 00c7 02       		.uleb128 0x2
+ 359 00c8 01       		.byte	0x1
+ 360 00c9 08       		.byte	0x8
+ 361 00ca 88020000 		.4byte	.LASF18
+ 362 00ce 02       		.uleb128 0x2
+ 363 00cf 08       		.byte	0x8
+ 364 00d0 04       		.byte	0x4
+ 365 00d1 07030000 		.4byte	.LASF19
+ 366 00d5 02       		.uleb128 0x2
+ 367 00d6 04       		.byte	0x4
+ 368 00d7 07       		.byte	0x7
+ 369 00d8 6B020000 		.4byte	.LASF20
+ 370 00dc 06       		.uleb128 0x6
+ 371 00dd 8C000000 		.4byte	0x8c
+ 372 00e1 07       		.uleb128 0x7
+ 373 00e2 01       		.byte	0x1
+ 374 00e3 37000000 		.4byte	0x37
+ 375 00e7 05       		.byte	0x5
+ 376 00e8 15       		.byte	0x15
+ 377 00e9 FA000000 		.4byte	0xfa
+ 378 00ed 08       		.uleb128 0x8
+ 379 00ee ED020000 		.4byte	.LASF21
+ 380 00f2 00       		.byte	0
+ 381 00f3 08       		.uleb128 0x8
+ 382 00f4 F6020000 		.4byte	.LASF22
+ 383 00f8 01       		.byte	0x1
+ 384 00f9 00       		.byte	0
+ 385 00fa 03       		.uleb128 0x3
+ 386 00fb 54000000 		.4byte	.LASF23
+ 387 00ff 05       		.byte	0x5
+ 388 0100 18       		.byte	0x18
+ 389 0101 E1000000 		.4byte	0xe1
+ 390 0105 09       		.uleb128 0x9
+ 391 0106 6C010000 		.4byte	.LASF24
+ 392 010a 01       		.byte	0x1
+ 393 010b 31       		.byte	0x31
+ 394 010c 00000000 		.4byte	.LFB63
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 10
+
+
+ 395 0110 68000000 		.4byte	.LFE63-.LFB63
+ 396 0114 01       		.uleb128 0x1
+ 397 0115 9C       		.byte	0x9c
+ 398 0116 28010000 		.4byte	0x128
+ 399 011a 0A       		.uleb128 0xa
+ 400 011b 6900     		.ascii	"i\000"
+ 401 011d 01       		.byte	0x1
+ 402 011e 33       		.byte	0x33
+ 403 011f 8C000000 		.4byte	0x8c
+ 404 0123 00000000 		.4byte	.LLST0
+ 405 0127 00       		.byte	0
+ 406 0128 09       		.uleb128 0x9
+ 407 0129 65000000 		.4byte	.LASF25
+ 408 012d 01       		.byte	0x1
+ 409 012e 46       		.byte	0x46
+ 410 012f 00000000 		.4byte	.LFB64
+ 411 0133 58000000 		.4byte	.LFE64-.LFB64
+ 412 0137 01       		.uleb128 0x1
+ 413 0138 9C       		.byte	0x9c
+ 414 0139 4B010000 		.4byte	0x14b
+ 415 013d 0A       		.uleb128 0xa
+ 416 013e 6900     		.ascii	"i\000"
+ 417 0140 01       		.byte	0x1
+ 418 0141 48       		.byte	0x48
+ 419 0142 8C000000 		.4byte	0x8c
+ 420 0146 2A000000 		.4byte	.LLST1
+ 421 014a 00       		.byte	0
+ 422 014b 0B       		.uleb128 0xb
+ 423 014c 7E000000 		.4byte	.LASF26
+ 424 0150 01       		.byte	0x1
+ 425 0151 5D       		.byte	0x5d
+ 426 0152 00000000 		.4byte	.LFB65
+ 427 0156 4C000000 		.4byte	.LFE65-.LFB65
+ 428 015a 01       		.uleb128 0x1
+ 429 015b 9C       		.byte	0x9c
+ 430 015c DF010000 		.4byte	0x1df
+ 431 0160 0C       		.uleb128 0xc
+ 432 0161 0A000000 		.4byte	.LASF27
+ 433 0165 01       		.byte	0x1
+ 434 0166 61       		.byte	0x61
+ 435 0167 8C000000 		.4byte	0x8c
+ 436 016b 02       		.uleb128 0x2
+ 437 016c 91       		.byte	0x91
+ 438 016d 77       		.sleb128 -9
+ 439 016e 0D       		.uleb128 0xd
+ 440 016f 74020000 		.4byte	.LASF28
+ 441 0173 01       		.byte	0x1
+ 442 0174 62       		.byte	0x62
+ 443 0175 FA000000 		.4byte	0xfa
+ 444 0179 54000000 		.4byte	.LLST2
+ 445 017d 0E       		.uleb128 0xe
+ 446 017e 08000000 		.4byte	.LVL17
+ 447 0182 B7020000 		.4byte	0x2b7
+ 448 0186 0F       		.uleb128 0xf
+ 449 0187 14000000 		.4byte	.LVL18
+ 450 018b C2020000 		.4byte	0x2c2
+ 451 018f A5010000 		.4byte	0x1a5
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 11
+
+
+ 452 0193 10       		.uleb128 0x10
+ 453 0194 01       		.uleb128 0x1
+ 454 0195 50       		.byte	0x50
+ 455 0196 01       		.uleb128 0x1
+ 456 0197 48       		.byte	0x48
+ 457 0198 10       		.uleb128 0x10
+ 458 0199 01       		.uleb128 0x1
+ 459 019a 51       		.byte	0x51
+ 460 019b 02       		.uleb128 0x2
+ 461 019c 08       		.byte	0x8
+ 462 019d 27       		.byte	0x27
+ 463 019e 10       		.uleb128 0x10
+ 464 019f 01       		.uleb128 0x1
+ 465 01a0 52       		.byte	0x52
+ 466 01a1 02       		.uleb128 0x2
+ 467 01a2 91       		.byte	0x91
+ 468 01a3 77       		.sleb128 -9
+ 469 01a4 00       		.byte	0
+ 470 01a5 0F       		.uleb128 0xf
+ 471 01a6 2C000000 		.4byte	.LVL20
+ 472 01aa CD020000 		.4byte	0x2cd
+ 473 01ae CC010000 		.4byte	0x1cc
+ 474 01b2 10       		.uleb128 0x10
+ 475 01b3 01       		.uleb128 0x1
+ 476 01b4 50       		.byte	0x50
+ 477 01b5 01       		.uleb128 0x1
+ 478 01b6 48       		.byte	0x48
+ 479 01b7 10       		.uleb128 0x10
+ 480 01b8 01       		.uleb128 0x1
+ 481 01b9 51       		.byte	0x51
+ 482 01ba 02       		.uleb128 0x2
+ 483 01bb 08       		.byte	0x8
+ 484 01bc 28       		.byte	0x28
+ 485 01bd 10       		.uleb128 0x10
+ 486 01be 01       		.uleb128 0x1
+ 487 01bf 52       		.byte	0x52
+ 488 01c0 01       		.uleb128 0x1
+ 489 01c1 36       		.byte	0x36
+ 490 01c2 10       		.uleb128 0x10
+ 491 01c3 01       		.uleb128 0x1
+ 492 01c4 53       		.byte	0x53
+ 493 01c5 05       		.uleb128 0x5
+ 494 01c6 03       		.byte	0x3
+ 495 01c7 00000000 		.4byte	AccelerometerData
+ 496 01cb 00       		.byte	0
+ 497 01cc 0E       		.uleb128 0xe
+ 498 01cd 32000000 		.4byte	.LVL21
+ 499 01d1 05010000 		.4byte	0x105
+ 500 01d5 0E       		.uleb128 0xe
+ 501 01d6 36000000 		.4byte	.LVL22
+ 502 01da 28010000 		.4byte	0x128
+ 503 01de 00       		.byte	0
+ 504 01df 11       		.uleb128 0x11
+ 505 01e0 5F010000 		.4byte	.LASF29
+ 506 01e4 06       		.byte	0x6
+ 507 01e5 1207     		.2byte	0x712
+ 508 01e7 EB010000 		.4byte	0x1eb
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 12
+
+
+ 509 01eb 06       		.uleb128 0x6
+ 510 01ec A2000000 		.4byte	0xa2
+ 511 01f0 12       		.uleb128 0x12
+ 512 01f1 8C000000 		.4byte	0x8c
+ 513 01f5 00020000 		.4byte	0x200
+ 514 01f9 13       		.uleb128 0x13
+ 515 01fa D5000000 		.4byte	0xd5
+ 516 01fe 0D       		.byte	0xd
+ 517 01ff 00       		.byte	0
+ 518 0200 14       		.uleb128 0x14
+ 519 0201 FC020000 		.4byte	.LASF30
+ 520 0205 01       		.byte	0x1
+ 521 0206 29       		.byte	0x29
+ 522 0207 F0010000 		.4byte	0x1f0
+ 523 020b 05       		.uleb128 0x5
+ 524 020c 03       		.byte	0x3
+ 525 020d 00000000 		.4byte	DataBuffer
+ 526 0211 14       		.uleb128 0x14
+ 527 0212 C9020000 		.4byte	.LASF31
+ 528 0216 01       		.byte	0x1
+ 529 0217 26       		.byte	0x26
+ 530 0218 DC000000 		.4byte	0xdc
+ 531 021c 05       		.uleb128 0x5
+ 532 021d 03       		.byte	0x3
+ 533 021e 00000000 		.4byte	PacketReadyFlag
+ 534 0222 12       		.uleb128 0x12
+ 535 0223 8C000000 		.4byte	0x8c
+ 536 0227 32020000 		.4byte	0x232
+ 537 022b 13       		.uleb128 0x13
+ 538 022c D5000000 		.4byte	0xd5
+ 539 0230 05       		.byte	0x5
+ 540 0231 00       		.byte	0
+ 541 0232 14       		.uleb128 0x14
+ 542 0233 AA010000 		.4byte	.LASF32
+ 543 0237 01       		.byte	0x1
+ 544 0238 17       		.byte	0x17
+ 545 0239 22020000 		.4byte	0x222
+ 546 023d 05       		.uleb128 0x5
+ 547 023e 03       		.byte	0x3
+ 548 023f 00000000 		.4byte	AccelerometerData
+ 549 0243 12       		.uleb128 0x12
+ 550 0244 97000000 		.4byte	0x97
+ 551 0248 53020000 		.4byte	0x253
+ 552 024c 13       		.uleb128 0x13
+ 553 024d D5000000 		.4byte	0xd5
+ 554 0251 02       		.byte	0x2
+ 555 0252 00       		.byte	0
+ 556 0253 14       		.uleb128 0x14
+ 557 0254 D9020000 		.4byte	.LASF33
+ 558 0258 01       		.byte	0x1
+ 559 0259 1A       		.byte	0x1a
+ 560 025a 43020000 		.4byte	0x243
+ 561 025e 05       		.uleb128 0x5
+ 562 025f 03       		.byte	0x3
+ 563 0260 00000000 		.4byte	Accelerations_digit
+ 564 0264 14       		.uleb128 0x14
+ 565 0265 4A020000 		.4byte	.LASF34
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 13
+
+
+ 566 0269 01       		.byte	0x1
+ 567 026a 1D       		.byte	0x1d
+ 568 026b 43020000 		.4byte	0x243
+ 569 026f 05       		.uleb128 0x5
+ 570 0270 03       		.byte	0x3
+ 571 0271 00000000 		.4byte	Accelerations_mg
+ 572 0275 12       		.uleb128 0x12
+ 573 0276 B9000000 		.4byte	0xb9
+ 574 027a 85020000 		.4byte	0x285
+ 575 027e 13       		.uleb128 0x13
+ 576 027f D5000000 		.4byte	0xd5
+ 577 0283 02       		.byte	0x2
+ 578 0284 00       		.byte	0
+ 579 0285 14       		.uleb128 0x14
+ 580 0286 42000000 		.4byte	.LASF35
+ 581 028a 01       		.byte	0x1
+ 582 028b 20       		.byte	0x20
+ 583 028c 75020000 		.4byte	0x275
+ 584 0290 05       		.uleb128 0x5
+ 585 0291 03       		.byte	0x3
+ 586 0292 00000000 		.4byte	Accelerations_ms2
+ 587 0296 12       		.uleb128 0x12
+ 588 0297 A2000000 		.4byte	0xa2
+ 589 029b A6020000 		.4byte	0x2a6
+ 590 029f 13       		.uleb128 0x13
+ 591 02a0 D5000000 		.4byte	0xd5
+ 592 02a4 02       		.byte	0x2
+ 593 02a5 00       		.byte	0
+ 594 02a6 14       		.uleb128 0x14
+ 595 02a7 B3020000 		.4byte	.LASF36
+ 596 02ab 01       		.byte	0x1
+ 597 02ac 23       		.byte	0x23
+ 598 02ad 96020000 		.4byte	0x296
+ 599 02b1 05       		.uleb128 0x5
+ 600 02b2 03       		.byte	0x3
+ 601 02b3 00000000 		.4byte	Accelerations_ms2_int
+ 602 02b7 15       		.uleb128 0x15
+ 603 02b8 29000000 		.4byte	.LASF37
+ 604 02bc 29000000 		.4byte	.LASF37
+ 605 02c0 07       		.byte	0x7
+ 606 02c1 5E       		.byte	0x5e
+ 607 02c2 15       		.uleb128 0x15
+ 608 02c3 8D020000 		.4byte	.LASF38
+ 609 02c7 8D020000 		.4byte	.LASF38
+ 610 02cb 08       		.byte	0x8
+ 611 02cc 28       		.byte	0x28
+ 612 02cd 15       		.uleb128 0x15
+ 613 02ce 7C010000 		.4byte	.LASF39
+ 614 02d2 7C010000 		.4byte	.LASF39
+ 615 02d6 08       		.byte	0x8
+ 616 02d7 36       		.byte	0x36
+ 617 02d8 00       		.byte	0
+ 618              		.section	.debug_abbrev,"",%progbits
+ 619              	.Ldebug_abbrev0:
+ 620 0000 01       		.uleb128 0x1
+ 621 0001 11       		.uleb128 0x11
+ 622 0002 01       		.byte	0x1
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 14
+
+
+ 623 0003 25       		.uleb128 0x25
+ 624 0004 0E       		.uleb128 0xe
+ 625 0005 13       		.uleb128 0x13
+ 626 0006 0B       		.uleb128 0xb
+ 627 0007 03       		.uleb128 0x3
+ 628 0008 0E       		.uleb128 0xe
+ 629 0009 1B       		.uleb128 0x1b
+ 630 000a 0E       		.uleb128 0xe
+ 631 000b 55       		.uleb128 0x55
+ 632 000c 17       		.uleb128 0x17
+ 633 000d 11       		.uleb128 0x11
+ 634 000e 01       		.uleb128 0x1
+ 635 000f 10       		.uleb128 0x10
+ 636 0010 17       		.uleb128 0x17
+ 637 0011 00       		.byte	0
+ 638 0012 00       		.byte	0
+ 639 0013 02       		.uleb128 0x2
+ 640 0014 24       		.uleb128 0x24
+ 641 0015 00       		.byte	0
+ 642 0016 0B       		.uleb128 0xb
+ 643 0017 0B       		.uleb128 0xb
+ 644 0018 3E       		.uleb128 0x3e
+ 645 0019 0B       		.uleb128 0xb
+ 646 001a 03       		.uleb128 0x3
+ 647 001b 0E       		.uleb128 0xe
+ 648 001c 00       		.byte	0
+ 649 001d 00       		.byte	0
+ 650 001e 03       		.uleb128 0x3
+ 651 001f 16       		.uleb128 0x16
+ 652 0020 00       		.byte	0
+ 653 0021 03       		.uleb128 0x3
+ 654 0022 0E       		.uleb128 0xe
+ 655 0023 3A       		.uleb128 0x3a
+ 656 0024 0B       		.uleb128 0xb
+ 657 0025 3B       		.uleb128 0x3b
+ 658 0026 0B       		.uleb128 0xb
+ 659 0027 49       		.uleb128 0x49
+ 660 0028 13       		.uleb128 0x13
+ 661 0029 00       		.byte	0
+ 662 002a 00       		.byte	0
+ 663 002b 04       		.uleb128 0x4
+ 664 002c 24       		.uleb128 0x24
+ 665 002d 00       		.byte	0
+ 666 002e 0B       		.uleb128 0xb
+ 667 002f 0B       		.uleb128 0xb
+ 668 0030 3E       		.uleb128 0x3e
+ 669 0031 0B       		.uleb128 0xb
+ 670 0032 03       		.uleb128 0x3
+ 671 0033 08       		.uleb128 0x8
+ 672 0034 00       		.byte	0
+ 673 0035 00       		.byte	0
+ 674 0036 05       		.uleb128 0x5
+ 675 0037 16       		.uleb128 0x16
+ 676 0038 00       		.byte	0
+ 677 0039 03       		.uleb128 0x3
+ 678 003a 0E       		.uleb128 0xe
+ 679 003b 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 15
+
+
+ 680 003c 0B       		.uleb128 0xb
+ 681 003d 3B       		.uleb128 0x3b
+ 682 003e 05       		.uleb128 0x5
+ 683 003f 49       		.uleb128 0x49
+ 684 0040 13       		.uleb128 0x13
+ 685 0041 00       		.byte	0
+ 686 0042 00       		.byte	0
+ 687 0043 06       		.uleb128 0x6
+ 688 0044 35       		.uleb128 0x35
+ 689 0045 00       		.byte	0
+ 690 0046 49       		.uleb128 0x49
+ 691 0047 13       		.uleb128 0x13
+ 692 0048 00       		.byte	0
+ 693 0049 00       		.byte	0
+ 694 004a 07       		.uleb128 0x7
+ 695 004b 04       		.uleb128 0x4
+ 696 004c 01       		.byte	0x1
+ 697 004d 0B       		.uleb128 0xb
+ 698 004e 0B       		.uleb128 0xb
+ 699 004f 49       		.uleb128 0x49
+ 700 0050 13       		.uleb128 0x13
+ 701 0051 3A       		.uleb128 0x3a
+ 702 0052 0B       		.uleb128 0xb
+ 703 0053 3B       		.uleb128 0x3b
+ 704 0054 0B       		.uleb128 0xb
+ 705 0055 01       		.uleb128 0x1
+ 706 0056 13       		.uleb128 0x13
+ 707 0057 00       		.byte	0
+ 708 0058 00       		.byte	0
+ 709 0059 08       		.uleb128 0x8
+ 710 005a 28       		.uleb128 0x28
+ 711 005b 00       		.byte	0
+ 712 005c 03       		.uleb128 0x3
+ 713 005d 0E       		.uleb128 0xe
+ 714 005e 1C       		.uleb128 0x1c
+ 715 005f 0B       		.uleb128 0xb
+ 716 0060 00       		.byte	0
+ 717 0061 00       		.byte	0
+ 718 0062 09       		.uleb128 0x9
+ 719 0063 2E       		.uleb128 0x2e
+ 720 0064 01       		.byte	0x1
+ 721 0065 3F       		.uleb128 0x3f
+ 722 0066 19       		.uleb128 0x19
+ 723 0067 03       		.uleb128 0x3
+ 724 0068 0E       		.uleb128 0xe
+ 725 0069 3A       		.uleb128 0x3a
+ 726 006a 0B       		.uleb128 0xb
+ 727 006b 3B       		.uleb128 0x3b
+ 728 006c 0B       		.uleb128 0xb
+ 729 006d 27       		.uleb128 0x27
+ 730 006e 19       		.uleb128 0x19
+ 731 006f 11       		.uleb128 0x11
+ 732 0070 01       		.uleb128 0x1
+ 733 0071 12       		.uleb128 0x12
+ 734 0072 06       		.uleb128 0x6
+ 735 0073 40       		.uleb128 0x40
+ 736 0074 18       		.uleb128 0x18
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 16
+
+
+ 737 0075 9642     		.uleb128 0x2116
+ 738 0077 19       		.uleb128 0x19
+ 739 0078 01       		.uleb128 0x1
+ 740 0079 13       		.uleb128 0x13
+ 741 007a 00       		.byte	0
+ 742 007b 00       		.byte	0
+ 743 007c 0A       		.uleb128 0xa
+ 744 007d 34       		.uleb128 0x34
+ 745 007e 00       		.byte	0
+ 746 007f 03       		.uleb128 0x3
+ 747 0080 08       		.uleb128 0x8
+ 748 0081 3A       		.uleb128 0x3a
+ 749 0082 0B       		.uleb128 0xb
+ 750 0083 3B       		.uleb128 0x3b
+ 751 0084 0B       		.uleb128 0xb
+ 752 0085 49       		.uleb128 0x49
+ 753 0086 13       		.uleb128 0x13
+ 754 0087 02       		.uleb128 0x2
+ 755 0088 17       		.uleb128 0x17
+ 756 0089 00       		.byte	0
+ 757 008a 00       		.byte	0
+ 758 008b 0B       		.uleb128 0xb
+ 759 008c 2E       		.uleb128 0x2e
+ 760 008d 01       		.byte	0x1
+ 761 008e 3F       		.uleb128 0x3f
+ 762 008f 19       		.uleb128 0x19
+ 763 0090 03       		.uleb128 0x3
+ 764 0091 0E       		.uleb128 0xe
+ 765 0092 3A       		.uleb128 0x3a
+ 766 0093 0B       		.uleb128 0xb
+ 767 0094 3B       		.uleb128 0x3b
+ 768 0095 0B       		.uleb128 0xb
+ 769 0096 27       		.uleb128 0x27
+ 770 0097 19       		.uleb128 0x19
+ 771 0098 11       		.uleb128 0x11
+ 772 0099 01       		.uleb128 0x1
+ 773 009a 12       		.uleb128 0x12
+ 774 009b 06       		.uleb128 0x6
+ 775 009c 40       		.uleb128 0x40
+ 776 009d 18       		.uleb128 0x18
+ 777 009e 9742     		.uleb128 0x2117
+ 778 00a0 19       		.uleb128 0x19
+ 779 00a1 01       		.uleb128 0x1
+ 780 00a2 13       		.uleb128 0x13
+ 781 00a3 00       		.byte	0
+ 782 00a4 00       		.byte	0
+ 783 00a5 0C       		.uleb128 0xc
+ 784 00a6 34       		.uleb128 0x34
+ 785 00a7 00       		.byte	0
+ 786 00a8 03       		.uleb128 0x3
+ 787 00a9 0E       		.uleb128 0xe
+ 788 00aa 3A       		.uleb128 0x3a
+ 789 00ab 0B       		.uleb128 0xb
+ 790 00ac 3B       		.uleb128 0x3b
+ 791 00ad 0B       		.uleb128 0xb
+ 792 00ae 49       		.uleb128 0x49
+ 793 00af 13       		.uleb128 0x13
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 17
+
+
+ 794 00b0 02       		.uleb128 0x2
+ 795 00b1 18       		.uleb128 0x18
+ 796 00b2 00       		.byte	0
+ 797 00b3 00       		.byte	0
+ 798 00b4 0D       		.uleb128 0xd
+ 799 00b5 34       		.uleb128 0x34
+ 800 00b6 00       		.byte	0
+ 801 00b7 03       		.uleb128 0x3
+ 802 00b8 0E       		.uleb128 0xe
+ 803 00b9 3A       		.uleb128 0x3a
+ 804 00ba 0B       		.uleb128 0xb
+ 805 00bb 3B       		.uleb128 0x3b
+ 806 00bc 0B       		.uleb128 0xb
+ 807 00bd 49       		.uleb128 0x49
+ 808 00be 13       		.uleb128 0x13
+ 809 00bf 02       		.uleb128 0x2
+ 810 00c0 17       		.uleb128 0x17
+ 811 00c1 00       		.byte	0
+ 812 00c2 00       		.byte	0
+ 813 00c3 0E       		.uleb128 0xe
+ 814 00c4 898201   		.uleb128 0x4109
+ 815 00c7 00       		.byte	0
+ 816 00c8 11       		.uleb128 0x11
+ 817 00c9 01       		.uleb128 0x1
+ 818 00ca 31       		.uleb128 0x31
+ 819 00cb 13       		.uleb128 0x13
+ 820 00cc 00       		.byte	0
+ 821 00cd 00       		.byte	0
+ 822 00ce 0F       		.uleb128 0xf
+ 823 00cf 898201   		.uleb128 0x4109
+ 824 00d2 01       		.byte	0x1
+ 825 00d3 11       		.uleb128 0x11
+ 826 00d4 01       		.uleb128 0x1
+ 827 00d5 31       		.uleb128 0x31
+ 828 00d6 13       		.uleb128 0x13
+ 829 00d7 01       		.uleb128 0x1
+ 830 00d8 13       		.uleb128 0x13
+ 831 00d9 00       		.byte	0
+ 832 00da 00       		.byte	0
+ 833 00db 10       		.uleb128 0x10
+ 834 00dc 8A8201   		.uleb128 0x410a
+ 835 00df 00       		.byte	0
+ 836 00e0 02       		.uleb128 0x2
+ 837 00e1 18       		.uleb128 0x18
+ 838 00e2 9142     		.uleb128 0x2111
+ 839 00e4 18       		.uleb128 0x18
+ 840 00e5 00       		.byte	0
+ 841 00e6 00       		.byte	0
+ 842 00e7 11       		.uleb128 0x11
+ 843 00e8 34       		.uleb128 0x34
+ 844 00e9 00       		.byte	0
+ 845 00ea 03       		.uleb128 0x3
+ 846 00eb 0E       		.uleb128 0xe
+ 847 00ec 3A       		.uleb128 0x3a
+ 848 00ed 0B       		.uleb128 0xb
+ 849 00ee 3B       		.uleb128 0x3b
+ 850 00ef 05       		.uleb128 0x5
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 18
+
+
+ 851 00f0 49       		.uleb128 0x49
+ 852 00f1 13       		.uleb128 0x13
+ 853 00f2 3F       		.uleb128 0x3f
+ 854 00f3 19       		.uleb128 0x19
+ 855 00f4 3C       		.uleb128 0x3c
+ 856 00f5 19       		.uleb128 0x19
+ 857 00f6 00       		.byte	0
+ 858 00f7 00       		.byte	0
+ 859 00f8 12       		.uleb128 0x12
+ 860 00f9 01       		.uleb128 0x1
+ 861 00fa 01       		.byte	0x1
+ 862 00fb 49       		.uleb128 0x49
+ 863 00fc 13       		.uleb128 0x13
+ 864 00fd 01       		.uleb128 0x1
+ 865 00fe 13       		.uleb128 0x13
+ 866 00ff 00       		.byte	0
+ 867 0100 00       		.byte	0
+ 868 0101 13       		.uleb128 0x13
+ 869 0102 21       		.uleb128 0x21
+ 870 0103 00       		.byte	0
+ 871 0104 49       		.uleb128 0x49
+ 872 0105 13       		.uleb128 0x13
+ 873 0106 2F       		.uleb128 0x2f
+ 874 0107 0B       		.uleb128 0xb
+ 875 0108 00       		.byte	0
+ 876 0109 00       		.byte	0
+ 877 010a 14       		.uleb128 0x14
+ 878 010b 34       		.uleb128 0x34
+ 879 010c 00       		.byte	0
+ 880 010d 03       		.uleb128 0x3
+ 881 010e 0E       		.uleb128 0xe
+ 882 010f 3A       		.uleb128 0x3a
+ 883 0110 0B       		.uleb128 0xb
+ 884 0111 3B       		.uleb128 0x3b
+ 885 0112 0B       		.uleb128 0xb
+ 886 0113 49       		.uleb128 0x49
+ 887 0114 13       		.uleb128 0x13
+ 888 0115 3F       		.uleb128 0x3f
+ 889 0116 19       		.uleb128 0x19
+ 890 0117 02       		.uleb128 0x2
+ 891 0118 18       		.uleb128 0x18
+ 892 0119 00       		.byte	0
+ 893 011a 00       		.byte	0
+ 894 011b 15       		.uleb128 0x15
+ 895 011c 2E       		.uleb128 0x2e
+ 896 011d 00       		.byte	0
+ 897 011e 3F       		.uleb128 0x3f
+ 898 011f 19       		.uleb128 0x19
+ 899 0120 3C       		.uleb128 0x3c
+ 900 0121 19       		.uleb128 0x19
+ 901 0122 6E       		.uleb128 0x6e
+ 902 0123 0E       		.uleb128 0xe
+ 903 0124 03       		.uleb128 0x3
+ 904 0125 0E       		.uleb128 0xe
+ 905 0126 3A       		.uleb128 0x3a
+ 906 0127 0B       		.uleb128 0xb
+ 907 0128 3B       		.uleb128 0x3b
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 19
+
+
+ 908 0129 0B       		.uleb128 0xb
+ 909 012a 00       		.byte	0
+ 910 012b 00       		.byte	0
+ 911 012c 00       		.byte	0
+ 912              		.section	.debug_loc,"",%progbits
+ 913              	.Ldebug_loc0:
+ 914              	.LLST0:
+ 915 0000 02000000 		.4byte	.LVL0
+ 916 0004 06000000 		.4byte	.LVL1
+ 917 0008 0200     		.2byte	0x2
+ 918 000a 30       		.byte	0x30
+ 919 000b 9F       		.byte	0x9f
+ 920 000c 06000000 		.4byte	.LVL1
+ 921 0010 46000000 		.4byte	.LVL6
+ 922 0014 0100     		.2byte	0x1
+ 923 0016 54       		.byte	0x54
+ 924 0017 48000000 		.4byte	.LVL7
+ 925 001b 4E000000 		.4byte	.LVL8
+ 926 001f 0100     		.2byte	0x1
+ 927 0021 54       		.byte	0x54
+ 928 0022 00000000 		.4byte	0
+ 929 0026 00000000 		.4byte	0
+ 930              	.LLST1:
+ 931 002a 02000000 		.4byte	.LVL9
+ 932 002e 06000000 		.4byte	.LVL10
+ 933 0032 0200     		.2byte	0x2
+ 934 0034 30       		.byte	0x30
+ 935 0035 9F       		.byte	0x9f
+ 936 0036 06000000 		.4byte	.LVL10
+ 937 003a 38000000 		.4byte	.LVL14
+ 938 003e 0100     		.2byte	0x1
+ 939 0040 54       		.byte	0x54
+ 940 0041 40000000 		.4byte	.LVL15
+ 941 0045 46000000 		.4byte	.LVL16
+ 942 0049 0100     		.2byte	0x1
+ 943 004b 54       		.byte	0x54
+ 944 004c 00000000 		.4byte	0
+ 945 0050 00000000 		.4byte	0
+ 946              	.LLST2:
+ 947 0054 14000000 		.4byte	.LVL18
+ 948 0058 28000000 		.4byte	.LVL19
+ 949 005c 0100     		.2byte	0x1
+ 950 005e 50       		.byte	0x50
+ 951 005f 2C000000 		.4byte	.LVL20
+ 952 0063 31000000 		.4byte	.LVL21-1
+ 953 0067 0100     		.2byte	0x1
+ 954 0069 50       		.byte	0x50
+ 955 006a 00000000 		.4byte	0
+ 956 006e 00000000 		.4byte	0
+ 957              		.section	.debug_aranges,"",%progbits
+ 958 0000 2C000000 		.4byte	0x2c
+ 959 0004 0200     		.2byte	0x2
+ 960 0006 00000000 		.4byte	.Ldebug_info0
+ 961 000a 04       		.byte	0x4
+ 962 000b 00       		.byte	0
+ 963 000c 0000     		.2byte	0
+ 964 000e 0000     		.2byte	0
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 20
+
+
+ 965 0010 00000000 		.4byte	.LFB63
+ 966 0014 68000000 		.4byte	.LFE63-.LFB63
+ 967 0018 00000000 		.4byte	.LFB64
+ 968 001c 58000000 		.4byte	.LFE64-.LFB64
+ 969 0020 00000000 		.4byte	.LFB65
+ 970 0024 4C000000 		.4byte	.LFE65-.LFB65
+ 971 0028 00000000 		.4byte	0
+ 972 002c 00000000 		.4byte	0
+ 973              		.section	.debug_ranges,"",%progbits
+ 974              	.Ldebug_ranges0:
+ 975 0000 00000000 		.4byte	.LFB63
+ 976 0004 68000000 		.4byte	.LFE63
+ 977 0008 00000000 		.4byte	.LFB64
+ 978 000c 58000000 		.4byte	.LFE64
+ 979 0010 00000000 		.4byte	.LFB65
+ 980 0014 4C000000 		.4byte	.LFE65
+ 981 0018 00000000 		.4byte	0
+ 982 001c 00000000 		.4byte	0
+ 983              		.section	.debug_line,"",%progbits
+ 984              	.Ldebug_line0:
+ 985 0000 12020000 		.section	.debug_str,"MS",%progbits,1
+ 985      02008701 
+ 985      00000201 
+ 985      FB0E0D00 
+ 985      01010101 
+ 986              	.LASF2:
+ 987 0000 5F5F7569 		.ascii	"__uint8_t\000"
+ 987      6E74385F 
+ 987      7400
+ 988              	.LASF27:
+ 989 000a 73746174 		.ascii	"status_reg\000"
+ 989      75735F72 
+ 989      656700
+ 990              	.LASF3:
+ 991 0015 5F5F696E 		.ascii	"__int16_t\000"
+ 991      7431365F 
+ 991      7400
+ 992              	.LASF6:
+ 993 001f 5F5F696E 		.ascii	"__int32_t\000"
+ 993      7433325F 
+ 993      7400
+ 994              	.LASF37:
+ 995 0029 54696D65 		.ascii	"Timer_ReadStatusRegister\000"
+ 995      725F5265 
+ 995      61645374 
+ 995      61747573 
+ 995      52656769 
+ 996              	.LASF35:
+ 997 0042 41636365 		.ascii	"Accelerations_ms2\000"
+ 997      6C657261 
+ 997      74696F6E 
+ 997      735F6D73 
+ 997      3200
+ 998              	.LASF23:
+ 999 0054 4572726F 		.ascii	"ErrorCode\000"
+ 999      72436F64 
+ 999      6500
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 21
+
+
+ 1000              	.LASF17:
+ 1001 005e 646F7562 		.ascii	"double\000"
+ 1001      6C6500
+ 1002              	.LASF25:
+ 1003 0065 5061636B 		.ascii	"Packet_Preparation\000"
+ 1003      65745F50 
+ 1003      72657061 
+ 1003      72617469 
+ 1003      6F6E00
+ 1004              	.LASF16:
+ 1005 0078 666C6F61 		.ascii	"float\000"
+ 1005      7400
+ 1006              	.LASF26:
+ 1007 007e 43757374 		.ascii	"Custom_TIMER_ISR\000"
+ 1007      6F6D5F54 
+ 1007      494D4552 
+ 1007      5F495352 
+ 1007      00
+ 1008              	.LASF1:
+ 1009 008f 756E7369 		.ascii	"unsigned char\000"
+ 1009      676E6564 
+ 1009      20636861 
+ 1009      7200
+ 1010              	.LASF40:
+ 1011 009d 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1011      43313120 
+ 1011      352E342E 
+ 1011      31203230 
+ 1011      31363036 
+ 1012 00d0 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1012      20726576 
+ 1012      6973696F 
+ 1012      6E203233 
+ 1012      37373135 
+ 1013 0103 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1013      66756E63 
+ 1013      74696F6E 
+ 1013      2D736563 
+ 1013      74696F6E 
+ 1014              	.LASF15:
+ 1015 012b 696E7431 		.ascii	"int16\000"
+ 1015      3600
+ 1016              	.LASF8:
+ 1017 0131 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1017      20756E73 
+ 1017      69676E65 
+ 1017      6420696E 
+ 1017      7400
+ 1018              	.LASF5:
+ 1019 0143 73686F72 		.ascii	"short unsigned int\000"
+ 1019      7420756E 
+ 1019      7369676E 
+ 1019      65642069 
+ 1019      6E7400
+ 1020              	.LASF7:
+ 1021 0156 6C6F6E67 		.ascii	"long int\000"
+ 1021      20696E74 
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 22
+
+
+ 1021      00
+ 1022              	.LASF29:
+ 1023 015f 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1023      52784275 
+ 1023      66666572 
+ 1023      00
+ 1024              	.LASF24:
+ 1025 016c 44617461 		.ascii	"Data_Conversion\000"
+ 1025      5F436F6E 
+ 1025      76657273 
+ 1025      696F6E00 
+ 1026              	.LASF39:
+ 1027 017c 4932435F 		.ascii	"I2C_Peripheral_ReadRegisterMulti\000"
+ 1027      50657269 
+ 1027      70686572 
+ 1027      616C5F52 
+ 1027      65616452 
+ 1028              	.LASF11:
+ 1029 019d 756E7369 		.ascii	"unsigned int\000"
+ 1029      676E6564 
+ 1029      20696E74 
+ 1029      00
+ 1030              	.LASF32:
+ 1031 01aa 41636365 		.ascii	"AccelerometerData\000"
+ 1031      6C65726F 
+ 1031      6D657465 
+ 1031      72446174 
+ 1031      6100
+ 1032              	.LASF10:
+ 1033 01bc 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1033      206C6F6E 
+ 1033      6720756E 
+ 1033      7369676E 
+ 1033      65642069 
+ 1034              	.LASF12:
+ 1035 01d3 75696E74 		.ascii	"uint8_t\000"
+ 1035      385F7400 
+ 1036              	.LASF42:
+ 1037 01db 433A5C55 		.ascii	"C:\\Users\\Beatrice Bonomi\\Desktop\\PSoC_03_Comple"
+ 1037      73657273 
+ 1037      5C426561 
+ 1037      74726963 
+ 1037      6520426F 
+ 1038 020a 74655C41 		.ascii	"te\\AY1920_II_HW_05_BONOMI_BEATRICE\\AY1920_II_HW_0"
+ 1038      59313932 
+ 1038      305F4949 
+ 1038      5F48575F 
+ 1038      30355F42 
+ 1039 023b 355F5052 		.ascii	"5_PROJ_3.cydsn\000"
+ 1039      4F4A5F33 
+ 1039      2E637964 
+ 1039      736E00
+ 1040              	.LASF34:
+ 1041 024a 41636365 		.ascii	"Accelerations_mg\000"
+ 1041      6C657261 
+ 1041      74696F6E 
+ 1041      735F6D67 
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 23
+
+
+ 1041      00
+ 1042              	.LASF13:
+ 1043 025b 696E7431 		.ascii	"int16_t\000"
+ 1043      365F7400 
+ 1044              	.LASF14:
+ 1045 0263 696E7433 		.ascii	"int32_t\000"
+ 1045      325F7400 
+ 1046              	.LASF20:
+ 1047 026b 73697A65 		.ascii	"sizetype\000"
+ 1047      74797065 
+ 1047      00
+ 1048              	.LASF28:
+ 1049 0274 6572726F 		.ascii	"error\000"
+ 1049      7200
+ 1050              	.LASF9:
+ 1051 027a 6C6F6E67 		.ascii	"long long int\000"
+ 1051      206C6F6E 
+ 1051      6720696E 
+ 1051      7400
+ 1052              	.LASF18:
+ 1053 0288 63686172 		.ascii	"char\000"
+ 1053      00
+ 1054              	.LASF38:
+ 1055 028d 4932435F 		.ascii	"I2C_Peripheral_ReadRegister\000"
+ 1055      50657269 
+ 1055      70686572 
+ 1055      616C5F52 
+ 1055      65616452 
+ 1056              	.LASF4:
+ 1057 02a9 73686F72 		.ascii	"short int\000"
+ 1057      7420696E 
+ 1057      7400
+ 1058              	.LASF36:
+ 1059 02b3 41636365 		.ascii	"Accelerations_ms2_int\000"
+ 1059      6C657261 
+ 1059      74696F6E 
+ 1059      735F6D73 
+ 1059      325F696E 
+ 1060              	.LASF31:
+ 1061 02c9 5061636B 		.ascii	"PacketReadyFlag\000"
+ 1061      65745265 
+ 1061      61647946 
+ 1061      6C616700 
+ 1062              	.LASF33:
+ 1063 02d9 41636365 		.ascii	"Accelerations_digit\000"
+ 1063      6C657261 
+ 1063      74696F6E 
+ 1063      735F6469 
+ 1063      67697400 
+ 1064              	.LASF21:
+ 1065 02ed 4E4F5F45 		.ascii	"NO_ERROR\000"
+ 1065      52524F52 
+ 1065      00
+ 1066              	.LASF22:
+ 1067 02f6 4552524F 		.ascii	"ERROR\000"
+ 1067      5200
+ 1068              	.LASF30:
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccFiP7Tf.s 			page 24
+
+
+ 1069 02fc 44617461 		.ascii	"DataBuffer\000"
+ 1069      42756666 
+ 1069      657200
+ 1070              	.LASF19:
+ 1071 0307 6C6F6E67 		.ascii	"long double\000"
+ 1071      20646F75 
+ 1071      626C6500 
+ 1072              	.LASF0:
+ 1073 0313 7369676E 		.ascii	"signed char\000"
+ 1073      65642063 
+ 1073      68617200 
+ 1074              	.LASF41:
+ 1075 031f 496E7465 		.ascii	"InterruptRoutines.c\000"
+ 1075      72727570 
+ 1075      74526F75 
+ 1075      74696E65 
+ 1075      732E6300 
+ 1076              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran

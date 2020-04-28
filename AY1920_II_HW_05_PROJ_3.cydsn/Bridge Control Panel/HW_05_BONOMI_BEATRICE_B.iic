@@ -1,0 +1,7 @@
+;--------------rx8 packet structure----------------
+;byte 1: header=0xA0
+;data: byte 2: X LSB, byte 3: X second byte, byte 4: X third byte, byte 5: X MSB
+;data: byte 6: Y LSB, byte 7: Y second byte, byte 8: Y third byte, byte 9: Y MSB
+;data: byte 10: Z LSB, byte 11: Z second byte, byte 12: Z third byte, byte 13: Z MSB
+;byte 14: tail=0xC0
+rx8 [h=A0] @0X @1X @2X @3X @0Y @1Y @2Y @3Y @0Z @1Z @2Z @3Z [t=C0]

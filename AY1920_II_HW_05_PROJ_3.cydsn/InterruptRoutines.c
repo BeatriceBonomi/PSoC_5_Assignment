@@ -92,6 +92,8 @@ void Packet_Preparation(void) {
 */
 CY_ISR(Custom_TIMER_ISR) {
     
+    Timer_ReadStatusRegister();
+    
     uint8_t status_reg;
     ErrorCode error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
                                                   STATUS_REG_ADDR,

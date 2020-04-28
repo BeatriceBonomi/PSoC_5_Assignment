@@ -151,13 +151,26 @@ int main(void)
         }
     }
     
+    /* set up header and tail */
+    DataBuffer[0] = 0xA0;
+    DataBuffer[TRANSMIT_BUFFER_SIZE-1] = 0xC0;
+    
     Timer_Start();
 
     /* associate the interrupt to the correct ISR vector */
     Timer_isr_StartEx(Custom_TIMER_ISR);
     
+    
+    /* check continuously if a packet is ready to be transmitted 
+    *  since DataBuffer content is modified by the ISR, time between 2 interrupts must be enough to complete the packet trasmission 
+    *  see TopDesign for the baudrate choice
+    */
     for(;;)
     {
+        if (PacketReadyFlag) {
+            UART_Debug_PutArray(DataBuffer, TRANSMIT_BUFFER_SIZE); /*API to transmit an array of bytes */
+            PacketReadyFlag = 0;
+        }
     }
 }
 

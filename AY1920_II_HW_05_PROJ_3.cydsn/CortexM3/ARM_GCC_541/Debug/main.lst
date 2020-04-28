@@ -1,4 +1,4 @@
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 1
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 1
 
 
    1              		.syntax unified
@@ -40,10 +40,11 @@ ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 1
   10:main.c        **** #include "project.h"
   11:main.c        **** #include "stdio.h"
   12:main.c        **** #include "registers.h"
-  13:main.c        **** 
-  14:main.c        **** int main(void)
-  15:main.c        **** {
-  28              		.loc 1 15 0
+  13:main.c        **** #include "InterruptRoutines.h"
+  14:main.c        **** 
+  15:main.c        **** int main(void)
+  16:main.c        **** {
+  28              		.loc 1 16 0
   29              		.cfi_startproc
   30              		@ args = 0, pretend = 0, frame = 56
   31              		@ frame_needed = 0, uses_anonymous_args = 0
@@ -53,1794 +54,1952 @@ ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 1
   35              		.cfi_offset 14, -4
   36 0002 8EB0     		sub	sp, sp, #56
   37              		.cfi_def_cfa_offset 64
-  16:main.c        ****     CyGlobalIntEnable; /* Enable global interrupts. */
-  38              		.loc 1 16 0
+  17:main.c        ****     CyGlobalIntEnable; /* Enable global interrupts. */
+  38              		.loc 1 17 0
   39              		.syntax unified
-  40              	@ 16 "main.c" 1
+  40              	@ 17 "main.c" 1
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 2
+
+
   41 0004 62B6     		CPSIE   i
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 2
-
-
   42              	@ 0 "" 2
-  17:main.c        **** 
-  18:main.c        ****     /* start components through API */
-  19:main.c        ****     I2C_Peripheral_Start();
-  43              		.loc 1 19 0
+  18:main.c        **** 
+  19:main.c        ****     /* start components through API */
+  20:main.c        ****     I2C_Peripheral_Start();
+  43              		.loc 1 20 0
   44              		.thumb
   45              		.syntax unified
   46 0006 FFF7FEFF 		bl	I2C_Peripheral_Start
   47              	.LVL0:
-  20:main.c        ****     UART_Debug_Start();
-  48              		.loc 1 20 0
+  21:main.c        ****     UART_Debug_Start();
+  48              		.loc 1 21 0
   49 000a FFF7FEFF 		bl	UART_Debug_Start
   50              	.LVL1:
-  21:main.c        ****     
-  22:main.c        ****     CyDelay(5); /* "The boot procedure is complete about 5 milliseconds after device power-up." */
-  51              		.loc 1 22 0
+  22:main.c        ****     
+  23:main.c        ****     CyDelay(5); /* "The boot procedure is complete about 5 milliseconds after device power-up." */
+  51              		.loc 1 23 0
   52 000e 0520     		movs	r0, #5
   53 0010 FFF7FEFF 		bl	CyDelay
   54              	.LVL2:
   55              	.LBB2:
-  23:main.c        ****     
-  24:main.c        ****     /* String to print out messages on the UART */
-  25:main.c        ****     char message[50];
-  26:main.c        ****     
-  27:main.c        ****     /* variable to check error in I2C communication */
-  28:main.c        ****     ErrorCode error;    
-  29:main.c        **** 
-  30:main.c        ****     // Check which devices are present on the I2C bus
-  31:main.c        ****     for (int i = 0 ; i < 128; i++)
-  56              		.loc 1 31 0
+  24:main.c        ****     
+  25:main.c        ****     /* String to print out messages on the UART */
+  26:main.c        ****     char message[50];
+  27:main.c        ****     
+  28:main.c        ****     /* variable to check error in I2C communication */
+  29:main.c        ****     ErrorCode error;    
+  30:main.c        **** 
+  31:main.c        ****     // Check which devices are present on the I2C bus
+  32:main.c        ****     for (int i = 0 ; i < 128; i++)
+  56              		.loc 1 32 0
   57 0014 0024     		movs	r4, #0
   58 0016 0CE0     		b	.L2
   59              	.LVL3:
   60              	.L4:
-  32:main.c        ****     {
-  33:main.c        ****         if (I2C_Peripheral_IsDeviceConnected(i))
-  61              		.loc 1 33 0
+  33:main.c        ****     {
+  34:main.c        ****         if (I2C_Peripheral_IsDeviceConnected(i))
+  61              		.loc 1 34 0
   62 0018 E0B2     		uxtb	r0, r4
   63 001a FFF7FEFF 		bl	I2C_Peripheral_IsDeviceConnected
   64              	.LVL4:
   65 001e 38B1     		cbz	r0, .L3
-  34:main.c        ****         {
-  35:main.c        ****             // print out the address is hex format
-  36:main.c        ****             sprintf(message, "Device 0x%02X is connected\r\n", i);
-  66              		.loc 1 36 0
+  35:main.c        ****         {
+  36:main.c        ****             // print out the address is hex format
+  37:main.c        ****             sprintf(message, "Device 0x%02X is connected\r\n", i);
+  66              		.loc 1 37 0
   67 0020 2246     		mov	r2, r4
-  68 0022 4949     		ldr	r1, .L18
+  68 0022 5449     		ldr	r1, .L20
   69 0024 01A8     		add	r0, sp, #4
   70 0026 FFF7FEFF 		bl	sprintf
   71              	.LVL5:
-  37:main.c        ****             UART_Debug_PutString(message); 
-  72              		.loc 1 37 0
+  38:main.c        ****             UART_Debug_PutString(message); 
+  72              		.loc 1 38 0
   73 002a 01A8     		add	r0, sp, #4
   74 002c FFF7FEFF 		bl	UART_Debug_PutString
   75              	.LVL6:
   76              	.L3:
-  31:main.c        ****     {
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 3
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 3
 
 
-  77              		.loc 1 31 0 discriminator 2
+  32:main.c        ****     {
+  77              		.loc 1 32 0 discriminator 2
   78 0030 0134     		adds	r4, r4, #1
   79              	.LVL7:
   80              	.L2:
-  31:main.c        ****     {
-  81              		.loc 1 31 0 is_stmt 0 discriminator 1
+  32:main.c        ****     {
+  81              		.loc 1 32 0 is_stmt 0 discriminator 1
   82 0032 7F2C     		cmp	r4, #127
   83 0034 F0DD     		ble	.L4
   84              	.LBE2:
-  38:main.c        ****         }
-  39:main.c        ****         
-  40:main.c        ****     }
-  41:main.c        ****     
-  42:main.c        ****     /* Configuration of control registers 1 and 4 to output 3 Axis accelerometer data in High Resol
-  43:main.c        ****     /* See registers.h for single bits meaning */
-  44:main.c        ****     /* Both register are first read and then, only if their content is not the desired one, they ar
-  45:main.c        ****     /* Read Control Register 1 */
-  46:main.c        ****     uint8_t ctrl_reg1; 
-  47:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
-  85              		.loc 1 47 0 is_stmt 1
+  39:main.c        ****         }
+  40:main.c        ****         
+  41:main.c        ****     }
+  42:main.c        ****     
+  43:main.c        ****     /* Configuration of control registers 1 and 4 to output 3 Axis accelerometer data in High Resol
+  44:main.c        ****     /* See registers.h for single bits meaning */
+  45:main.c        ****     /* Both register are first read and then, only if their content is not the desired one, they ar
+  46:main.c        ****     /* Read Control Register 1 */
+  47:main.c        ****     uint8_t ctrl_reg1; 
+  48:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+  85              		.loc 1 48 0 is_stmt 1
   86 0036 0DF10302 		add	r2, sp, #3
   87 003a 2021     		movs	r1, #32
   88 003c 1820     		movs	r0, #24
   89 003e FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
   90              	.LVL8:
-  48:main.c        ****                                         CTRL_REG_1_ADDR,
-  49:main.c        ****                                         &ctrl_reg1);
-  50:main.c        ****     
-  51:main.c        ****     if (error == NO_ERROR)
-  91              		.loc 1 51 0
+  49:main.c        ****                                         CTRL_REG_1_ADDR,
+  50:main.c        ****                                         &ctrl_reg1);
+  51:main.c        ****     
+  52:main.c        ****     if (error == NO_ERROR)
+  91              		.loc 1 52 0
   92 0042 48B9     		cbnz	r0, .L5
-  52:main.c        ****     {
-  53:main.c        ****         sprintf(message, "CONTROL REGISTER 1: 0x%02X\r\n", ctrl_reg1);
-  93              		.loc 1 53 0
+  53:main.c        ****     {
+  54:main.c        ****         sprintf(message, "CONTROL REGISTER 1: 0x%02X\r\n", ctrl_reg1);
+  93              		.loc 1 54 0
   94 0044 9DF80320 		ldrb	r2, [sp, #3]	@ zero_extendqisi2
-  95 0048 4049     		ldr	r1, .L18+4
+  95 0048 4B49     		ldr	r1, .L20+4
   96 004a 01A8     		add	r0, sp, #4
   97              	.LVL9:
   98 004c FFF7FEFF 		bl	sprintf
   99              	.LVL10:
-  54:main.c        ****         UART_Debug_PutString(message); 
- 100              		.loc 1 54 0
+  55:main.c        ****         UART_Debug_PutString(message); 
+ 100              		.loc 1 55 0
  101 0050 01A8     		add	r0, sp, #4
  102 0052 FFF7FEFF 		bl	UART_Debug_PutString
  103              	.LVL11:
  104 0056 02E0     		b	.L6
  105              	.LVL12:
  106              	.L5:
-  55:main.c        ****     }
-  56:main.c        ****     else
-  57:main.c        ****     {
-  58:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n");   
- 107              		.loc 1 58 0
- 108 0058 3D48     		ldr	r0, .L18+8
+  56:main.c        ****     }
+  57:main.c        ****     else
+  58:main.c        ****     {
+  59:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n");   
+ 107              		.loc 1 59 0
+ 108 0058 4848     		ldr	r0, .L20+8
  109              	.LVL13:
  110 005a FFF7FEFF 		bl	UART_Debug_PutString
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 4
+
+
  111              	.LVL14:
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 4
-
-
  112              	.L6:
-  59:main.c        ****     }
-  60:main.c        ****     
-  61:main.c        ****     /* Write Control Register 1 (only if the read content is not the desired one) */
-  62:main.c        ****     if (ctrl_reg1 != CTRL_REG_1_CONTENT)  
- 113              		.loc 1 62 0
+  60:main.c        ****     }
+  61:main.c        ****     
+  62:main.c        ****     /* Write Control Register 1 (only if the read content is not the desired one) */
+  63:main.c        ****     if (ctrl_reg1 != CTRL_REG_1_CONTENT)  
+ 113              		.loc 1 63 0
  114 005e 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
  115 0062 572B     		cmp	r3, #87
  116 0064 2BD0     		beq	.L7
-  63:main.c        ****     {
-  64:main.c        ****         UART_Debug_PutString("\r\nWriting new values..\r\n");
- 117              		.loc 1 64 0
- 118 0066 3B48     		ldr	r0, .L18+12
+  64:main.c        ****     {
+  65:main.c        ****         UART_Debug_PutString("\r\nWriting new values..\r\n");
+ 117              		.loc 1 65 0
+ 118 0066 4648     		ldr	r0, .L20+12
  119 0068 FFF7FEFF 		bl	UART_Debug_PutString
  120              	.LVL15:
-  65:main.c        ****         
-  66:main.c        ****         ctrl_reg1 = CTRL_REG_1_CONTENT;
- 121              		.loc 1 66 0
+  66:main.c        ****         
+  67:main.c        ****         ctrl_reg1 = CTRL_REG_1_CONTENT;
+ 121              		.loc 1 67 0
  122 006c 5722     		movs	r2, #87
  123 006e 8DF80320 		strb	r2, [sp, #3]
-  67:main.c        ****     
-  68:main.c        ****         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
- 124              		.loc 1 68 0
+  68:main.c        ****     
+  69:main.c        ****         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
+ 124              		.loc 1 69 0
  125 0072 2021     		movs	r1, #32
  126 0074 1820     		movs	r0, #24
  127 0076 FFF7FEFF 		bl	I2C_Peripheral_WriteRegister
  128              	.LVL16:
-  69:main.c        ****                                              CTRL_REG_1_ADDR,
-  70:main.c        ****                                              ctrl_reg1);
-  71:main.c        ****     
-  72:main.c        ****         if (error == NO_ERROR)
- 129              		.loc 1 72 0
+  70:main.c        ****                                              CTRL_REG_1_ADDR,
+  71:main.c        ****                                              ctrl_reg1);
+  72:main.c        ****     
+  73:main.c        ****         if (error == NO_ERROR)
+ 129              		.loc 1 73 0
  130 007a 48B9     		cbnz	r0, .L8
-  73:main.c        ****         {
-  74:main.c        ****             sprintf(message, "CONTROL REGISTER 1 successfully written as: 0x%02X\r\n", ctrl_reg1);
- 131              		.loc 1 74 0
+  74:main.c        ****         {
+  75:main.c        ****             sprintf(message, "CONTROL REGISTER 1 successfully written as: 0x%02X\r\n", ctrl_reg1);
+ 131              		.loc 1 75 0
  132 007c 9DF80320 		ldrb	r2, [sp, #3]	@ zero_extendqisi2
- 133 0080 3549     		ldr	r1, .L18+16
+ 133 0080 4049     		ldr	r1, .L20+16
  134 0082 01A8     		add	r0, sp, #4
  135              	.LVL17:
  136 0084 FFF7FEFF 		bl	sprintf
  137              	.LVL18:
-  75:main.c        ****             UART_Debug_PutString(message); 
- 138              		.loc 1 75 0
+  76:main.c        ****             UART_Debug_PutString(message); 
+ 138              		.loc 1 76 0
  139 0088 01A8     		add	r0, sp, #4
  140 008a FFF7FEFF 		bl	UART_Debug_PutString
  141              	.LVL19:
  142 008e 02E0     		b	.L9
  143              	.LVL20:
  144              	.L8:
-  76:main.c        ****         }
-  77:main.c        ****         else
-  78:main.c        ****         {
-  79:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to set control register 1\r\n");  
- 145              		.loc 1 79 0
- 146 0090 3248     		ldr	r0, .L18+20
+  77:main.c        ****         }
+  78:main.c        ****         else
+  79:main.c        ****         {
+  80:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to set control register 1\r\n");  
+ 145              		.loc 1 80 0
+ 146 0090 3D48     		ldr	r0, .L20+20
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 5
+
+
  147              	.LVL21:
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 5
-
-
  148 0092 FFF7FEFF 		bl	UART_Debug_PutString
  149              	.LVL22:
  150              	.L9:
-  80:main.c        ****         }
-  81:main.c        ****     
+  81:main.c        ****         }
   82:main.c        ****     
-  83:main.c        ****         /* Read Control Register 1 again to check for correct writing */
-  84:main.c        ****         error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 151              		.loc 1 84 0
+  83:main.c        ****     
+  84:main.c        ****         /* Read Control Register 1 again to check for correct writing */
+  85:main.c        ****         error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 151              		.loc 1 85 0
  152 0096 0DF10302 		add	r2, sp, #3
  153 009a 2021     		movs	r1, #32
  154 009c 1820     		movs	r0, #24
  155 009e FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
  156              	.LVL23:
-  85:main.c        ****                                             CTRL_REG_1_ADDR,
-  86:main.c        ****                                             &ctrl_reg1);
-  87:main.c        ****         
-  88:main.c        ****         if (error == NO_ERROR)
- 157              		.loc 1 88 0
+  86:main.c        ****                                             CTRL_REG_1_ADDR,
+  87:main.c        ****                                             &ctrl_reg1);
+  88:main.c        ****         
+  89:main.c        ****         if (error == NO_ERROR)
+ 157              		.loc 1 89 0
  158 00a2 48B9     		cbnz	r0, .L10
-  89:main.c        ****         {
-  90:main.c        ****             sprintf(message, "CONTROL REGISTER 1 after overwrite operation: 0x%02X\r\n", ctrl_reg1)
- 159              		.loc 1 90 0
+  90:main.c        ****         {
+  91:main.c        ****             sprintf(message, "CONTROL REGISTER 1 after overwrite operation: 0x%02X\r\n", ctrl_reg1)
+ 159              		.loc 1 91 0
  160 00a4 9DF80320 		ldrb	r2, [sp, #3]	@ zero_extendqisi2
- 161 00a8 2D49     		ldr	r1, .L18+24
+ 161 00a8 3849     		ldr	r1, .L20+24
  162 00aa 01A8     		add	r0, sp, #4
  163              	.LVL24:
  164 00ac FFF7FEFF 		bl	sprintf
  165              	.LVL25:
-  91:main.c        ****             UART_Debug_PutString(message); 
- 166              		.loc 1 91 0
+  92:main.c        ****             UART_Debug_PutString(message); 
+ 166              		.loc 1 92 0
  167 00b0 01A8     		add	r0, sp, #4
  168 00b2 FFF7FEFF 		bl	UART_Debug_PutString
  169              	.LVL26:
  170 00b6 02E0     		b	.L7
  171              	.LVL27:
  172              	.L10:
-  92:main.c        ****         }
-  93:main.c        ****         else
-  94:main.c        ****         {
-  95:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n"); 
- 173              		.loc 1 95 0
- 174 00b8 2548     		ldr	r0, .L18+8
+  93:main.c        ****         }
+  94:main.c        ****         else
+  95:main.c        ****         {
+  96:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to read control register 1\r\n"); 
+ 173              		.loc 1 96 0
+ 174 00b8 3048     		ldr	r0, .L20+8
  175              	.LVL28:
  176 00ba FFF7FEFF 		bl	UART_Debug_PutString
  177              	.LVL29:
  178              	.L7:
-  96:main.c        ****         }
-  97:main.c        ****     }
-  98:main.c        ****     
-  99:main.c        ****     /* Read Control Register 4 */
- 100:main.c        ****     uint8_t ctrl_reg4; 
- 101:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 179              		.loc 1 101 0
+  97:main.c        ****         }
+  98:main.c        ****     }
+  99:main.c        ****     
+ 100:main.c        ****     /* Read Control Register 4 */
+ 101:main.c        ****     uint8_t ctrl_reg4; 
+ 102:main.c        ****     error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 179              		.loc 1 102 0
  180 00be 0DF10202 		add	r2, sp, #2
  181 00c2 2321     		movs	r1, #35
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 6
+
+
  182 00c4 1820     		movs	r0, #24
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 6
-
-
  183 00c6 FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
  184              	.LVL30:
- 102:main.c        ****                                         CTRL_REG_4_ADDR,
- 103:main.c        ****                                         &ctrl_reg4);
- 104:main.c        ****     
- 105:main.c        ****     if (error == NO_ERROR)
- 185              		.loc 1 105 0
+ 103:main.c        ****                                         CTRL_REG_4_ADDR,
+ 104:main.c        ****                                         &ctrl_reg4);
+ 105:main.c        ****     
+ 106:main.c        ****     if (error == NO_ERROR)
+ 185              		.loc 1 106 0
  186 00ca 48B9     		cbnz	r0, .L11
- 106:main.c        ****     {
- 107:main.c        ****         sprintf(message, "CONTROL REGISTER 4: 0x%02X\r\n", ctrl_reg4);
- 187              		.loc 1 107 0
+ 107:main.c        ****     {
+ 108:main.c        ****         sprintf(message, "CONTROL REGISTER 4: 0x%02X\r\n", ctrl_reg4);
+ 187              		.loc 1 108 0
  188 00cc 9DF80220 		ldrb	r2, [sp, #2]	@ zero_extendqisi2
- 189 00d0 2449     		ldr	r1, .L18+28
+ 189 00d0 2F49     		ldr	r1, .L20+28
  190 00d2 01A8     		add	r0, sp, #4
  191              	.LVL31:
  192 00d4 FFF7FEFF 		bl	sprintf
  193              	.LVL32:
- 108:main.c        ****         UART_Debug_PutString(message); 
- 194              		.loc 1 108 0
+ 109:main.c        ****         UART_Debug_PutString(message); 
+ 194              		.loc 1 109 0
  195 00d8 01A8     		add	r0, sp, #4
  196 00da FFF7FEFF 		bl	UART_Debug_PutString
  197              	.LVL33:
  198 00de 02E0     		b	.L12
  199              	.LVL34:
  200              	.L11:
- 109:main.c        ****     }
- 110:main.c        ****     else
- 111:main.c        ****     {
- 112:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 4\r\n");   
- 201              		.loc 1 112 0
- 202 00e0 2148     		ldr	r0, .L18+32
+ 110:main.c        ****     }
+ 111:main.c        ****     else
+ 112:main.c        ****     {
+ 113:main.c        ****         UART_Debug_PutString("Error occurred during I2C comm to read control register 4\r\n");   
+ 201              		.loc 1 113 0
+ 202 00e0 2C48     		ldr	r0, .L20+32
  203              	.LVL35:
  204 00e2 FFF7FEFF 		bl	UART_Debug_PutString
  205              	.LVL36:
  206              	.L12:
- 113:main.c        ****     }
- 114:main.c        ****     
- 115:main.c        ****     /* Write Control Register 4 (only if the read content is not the desired one) */    
- 116:main.c        ****     if (ctrl_reg4 != CTRL_REG_4_CONTENT)
- 207              		.loc 1 116 0
+ 114:main.c        ****     }
+ 115:main.c        ****     
+ 116:main.c        ****     /* Write Control Register 4 (only if the read content is not the desired one) */    
+ 117:main.c        ****     if (ctrl_reg4 != CTRL_REG_4_CONTENT)
+ 207              		.loc 1 117 0
  208 00e6 9DF80230 		ldrb	r3, [sp, #2]	@ zero_extendqisi2
  209 00ea 182B     		cmp	r3, #24
  210 00ec 2BD0     		beq	.L13
- 117:main.c        ****     {
- 118:main.c        ****         UART_Debug_PutString("\r\nWriting new values..\r\n");
- 211              		.loc 1 118 0
- 212 00ee 1948     		ldr	r0, .L18+12
+ 118:main.c        ****     {
+ 119:main.c        ****         UART_Debug_PutString("\r\nWriting new values..\r\n");
+ 211              		.loc 1 119 0
+ 212 00ee 2448     		ldr	r0, .L20+12
  213 00f0 FFF7FEFF 		bl	UART_Debug_PutString
  214              	.LVL37:
- 119:main.c        ****         
- 120:main.c        ****         ctrl_reg4 = CTRL_REG_4_CONTENT;
- 215              		.loc 1 120 0
+ 120:main.c        ****         
+ 121:main.c        ****         ctrl_reg4 = CTRL_REG_4_CONTENT;
+ 215              		.loc 1 121 0
  216 00f4 1820     		movs	r0, #24
  217 00f6 8DF80200 		strb	r0, [sp, #2]
- 121:main.c        ****     
- 122:main.c        ****         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
- 218              		.loc 1 122 0
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 7
+ 122:main.c        ****     
+ 123:main.c        ****         error = I2C_Peripheral_WriteRegister(LIS3DH_DEVICE_ADDRESS,
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 7
 
 
+ 218              		.loc 1 123 0
  219 00fa 0246     		mov	r2, r0
  220 00fc 2321     		movs	r1, #35
  221 00fe FFF7FEFF 		bl	I2C_Peripheral_WriteRegister
  222              	.LVL38:
- 123:main.c        ****                                              CTRL_REG_4_ADDR,
- 124:main.c        ****                                              ctrl_reg4);
- 125:main.c        ****     
- 126:main.c        ****         if (error == NO_ERROR)
- 223              		.loc 1 126 0
+ 124:main.c        ****                                              CTRL_REG_4_ADDR,
+ 125:main.c        ****                                              ctrl_reg4);
+ 126:main.c        ****     
+ 127:main.c        ****         if (error == NO_ERROR)
+ 223              		.loc 1 127 0
  224 0102 48B9     		cbnz	r0, .L14
- 127:main.c        ****         {
- 128:main.c        ****             sprintf(message, "CONTROL REGISTER 4 successfully written as: 0x%02X\r\n", ctrl_reg4);
- 225              		.loc 1 128 0
+ 128:main.c        ****         {
+ 129:main.c        ****             sprintf(message, "CONTROL REGISTER 4 successfully written as: 0x%02X\r\n", ctrl_reg4);
+ 225              		.loc 1 129 0
  226 0104 9DF80220 		ldrb	r2, [sp, #2]	@ zero_extendqisi2
- 227 0108 1849     		ldr	r1, .L18+36
+ 227 0108 2349     		ldr	r1, .L20+36
  228 010a 01A8     		add	r0, sp, #4
  229              	.LVL39:
  230 010c FFF7FEFF 		bl	sprintf
  231              	.LVL40:
- 129:main.c        ****             UART_Debug_PutString(message); 
- 232              		.loc 1 129 0
+ 130:main.c        ****             UART_Debug_PutString(message); 
+ 232              		.loc 1 130 0
  233 0110 01A8     		add	r0, sp, #4
  234 0112 FFF7FEFF 		bl	UART_Debug_PutString
  235              	.LVL41:
  236 0116 02E0     		b	.L15
  237              	.LVL42:
  238              	.L14:
- 130:main.c        ****         }
- 131:main.c        ****         else
- 132:main.c        ****         {
- 133:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to set control register 4\r\n");  
- 239              		.loc 1 133 0
- 240 0118 1548     		ldr	r0, .L18+40
+ 131:main.c        ****         }
+ 132:main.c        ****         else
+ 133:main.c        ****         {
+ 134:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to set control register 4\r\n");  
+ 239              		.loc 1 134 0
+ 240 0118 2048     		ldr	r0, .L20+40
  241              	.LVL43:
  242 011a FFF7FEFF 		bl	UART_Debug_PutString
  243              	.LVL44:
  244              	.L15:
- 134:main.c        ****         }
- 135:main.c        ****     
+ 135:main.c        ****         }
  136:main.c        ****     
- 137:main.c        ****         /* Read Control Register 4 again to check for correct writing */
- 138:main.c        ****         error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
- 245              		.loc 1 138 0
+ 137:main.c        ****     
+ 138:main.c        ****         /* Read Control Register 4 again to check for correct writing */
+ 139:main.c        ****         error = I2C_Peripheral_ReadRegister(LIS3DH_DEVICE_ADDRESS,
+ 245              		.loc 1 139 0
  246 011e 0DF10202 		add	r2, sp, #2
  247 0122 2321     		movs	r1, #35
  248 0124 1820     		movs	r0, #24
  249 0126 FFF7FEFF 		bl	I2C_Peripheral_ReadRegister
  250              	.LVL45:
- 139:main.c        ****                                             CTRL_REG_4_ADDR,
- 140:main.c        ****                                             &ctrl_reg4);
- 141:main.c        ****         
- 142:main.c        ****         if (error == NO_ERROR)
- 251              		.loc 1 142 0
+ 140:main.c        ****                                             CTRL_REG_4_ADDR,
+ 141:main.c        ****                                             &ctrl_reg4);
+ 142:main.c        ****         
+ 143:main.c        ****         if (error == NO_ERROR)
+ 251              		.loc 1 143 0
  252 012a 48B9     		cbnz	r0, .L16
- 143:main.c        ****         {
- 144:main.c        ****             sprintf(message, "CONTROL REGISTER 4 after overwrite operation: 0x%02X\r\n", ctrl_reg4)
- 253              		.loc 1 144 0
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 8
+ 144:main.c        ****         {
+ 145:main.c        ****             sprintf(message, "CONTROL REGISTER 4 after overwrite operation: 0x%02X\r\n", ctrl_reg4)
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 8
 
 
+ 253              		.loc 1 145 0
  254 012c 9DF80220 		ldrb	r2, [sp, #2]	@ zero_extendqisi2
- 255 0130 1049     		ldr	r1, .L18+44
+ 255 0130 1B49     		ldr	r1, .L20+44
  256 0132 01A8     		add	r0, sp, #4
  257              	.LVL46:
  258 0134 FFF7FEFF 		bl	sprintf
  259              	.LVL47:
- 145:main.c        ****             UART_Debug_PutString(message); 
- 260              		.loc 1 145 0
+ 146:main.c        ****             UART_Debug_PutString(message); 
+ 260              		.loc 1 146 0
  261 0138 01A8     		add	r0, sp, #4
  262 013a FFF7FEFF 		bl	UART_Debug_PutString
  263              	.LVL48:
  264 013e 02E0     		b	.L13
  265              	.LVL49:
  266              	.L16:
- 146:main.c        ****         }
- 147:main.c        ****         else
- 148:main.c        ****         {
- 149:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to read control register 4\r\n"); 
- 267              		.loc 1 149 0
- 268 0140 0948     		ldr	r0, .L18+32
+ 147:main.c        ****         }
+ 148:main.c        ****         else
+ 149:main.c        ****         {
+ 150:main.c        ****             UART_Debug_PutString("Error occurred during I2C comm to read control register 4\r\n"); 
+ 267              		.loc 1 150 0
+ 268 0140 1448     		ldr	r0, .L20+32
  269              	.LVL50:
  270 0142 FFF7FEFF 		bl	UART_Debug_PutString
  271              	.LVL51:
  272              	.L13:
- 273 0146 FEE7     		b	.L13
- 274              	.L19:
- 275              		.align	2
- 276              	.L18:
- 277 0148 00000000 		.word	.LC0
- 278 014c 20000000 		.word	.LC1
- 279 0150 40000000 		.word	.LC2
- 280 0154 7C000000 		.word	.LC3
- 281 0158 98000000 		.word	.LC4
- 282 015c D0000000 		.word	.LC5
- 283 0160 0C010000 		.word	.LC6
- 284 0164 44010000 		.word	.LC7
- 285 0168 64010000 		.word	.LC8
- 286 016c A0010000 		.word	.LC9
- 287 0170 D8010000 		.word	.LC10
- 288 0174 14020000 		.word	.LC11
- 289              		.cfi_endproc
- 290              	.LFE64:
- 291              		.size	main, .-main
- 292              		.section	.rodata.str1.4,"aMS",%progbits,1
- 293              		.align	2
- 294              	.LC0:
- 295 0000 44657669 		.ascii	"Device 0x%02X is connected\015\012\000"
- 295      63652030 
- 295      78253032 
- 295      58206973 
- 295      20636F6E 
- 296 001d 000000   		.space	3
- 297              	.LC1:
- 298 0020 434F4E54 		.ascii	"CONTROL REGISTER 1: 0x%02X\015\012\000"
- 298      524F4C20 
- 298      52454749 
- 298      53544552 
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 9
+ 151:main.c        ****         }
+ 152:main.c        ****     }
+ 153:main.c        ****     
+ 154:main.c        ****     /* set up header and tail */
+ 155:main.c        ****     DataBuffer[0] = 0xA0;
+ 273              		.loc 1 155 0
+ 274 0146 174B     		ldr	r3, .L20+48
+ 275 0148 A022     		movs	r2, #160
+ 276 014a 1A70     		strb	r2, [r3]
+ 156:main.c        ****     DataBuffer[TRANSMIT_BUFFER_SIZE-1] = 0xC0;
+ 277              		.loc 1 156 0
+ 278 014c C022     		movs	r2, #192
+ 279 014e 5A73     		strb	r2, [r3, #13]
+ 157:main.c        ****     
+ 158:main.c        ****     Timer_Start();
+ 280              		.loc 1 158 0
+ 281 0150 FFF7FEFF 		bl	Timer_Start
+ 282              	.LVL52:
+ 159:main.c        **** 
+ 160:main.c        ****     /* associate the interrupt to the correct ISR vector */
+ 161:main.c        ****     Timer_isr_StartEx(Custom_TIMER_ISR);
+ 283              		.loc 1 161 0
+ 284 0154 1448     		ldr	r0, .L20+52
+ 285 0156 FFF7FEFF 		bl	Timer_isr_StartEx
+ 286              	.LVL53:
+ 287              	.L17:
+ 162:main.c        ****     
+ 163:main.c        ****     
+ 164:main.c        ****     /* check continuously if a packet is ready to be transmitted 
+ 165:main.c        ****     *  since DataBuffer content is modified by the ISR, time between 2 interrupts must be enough to
+ 166:main.c        ****     *  see TopDesign for the baudrate choice
+ 167:main.c        ****     */
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 9
 
 
- 298      20313A20 
- 299 003d 000000   		.space	3
- 300              	.LC2:
- 301 0040 4572726F 		.ascii	"Error occurred during I2C comm to read control regi"
- 301      72206F63 
- 301      63757272 
- 301      65642064 
- 301      7572696E 
- 302 0073 73746572 		.ascii	"ster 1\015\012\000"
- 302      20310D0A 
- 302      00
- 303              	.LC3:
- 304 007c 0D0A5772 		.ascii	"\015\012Writing new values..\015\012\000"
- 304      6974696E 
- 304      67206E65 
- 304      77207661 
- 304      6C756573 
- 305 0095 000000   		.space	3
- 306              	.LC4:
- 307 0098 434F4E54 		.ascii	"CONTROL REGISTER 1 successfully written as: 0x%02X\015"
- 307      524F4C20 
- 307      52454749 
- 307      53544552 
- 307      20312073 
- 308 00cb 0A00     		.ascii	"\012\000"
- 309 00cd 000000   		.space	3
- 310              	.LC5:
- 311 00d0 4572726F 		.ascii	"Error occurred during I2C comm to set control regis"
- 311      72206F63 
- 311      63757272 
- 311      65642064 
- 311      7572696E 
- 312 0103 74657220 		.ascii	"ter 1\015\012\000"
- 312      310D0A00 
- 313 010b 00       		.space	1
- 314              	.LC6:
- 315 010c 434F4E54 		.ascii	"CONTROL REGISTER 1 after overwrite operation: 0x%02"
- 315      524F4C20 
- 315      52454749 
- 315      53544552 
- 315      20312061 
- 316 013f 580D0A00 		.ascii	"X\015\012\000"
- 317 0143 00       		.space	1
- 318              	.LC7:
- 319 0144 434F4E54 		.ascii	"CONTROL REGISTER 4: 0x%02X\015\012\000"
- 319      524F4C20 
- 319      52454749 
- 319      53544552 
- 319      20343A20 
- 320 0161 000000   		.space	3
- 321              	.LC8:
- 322 0164 4572726F 		.ascii	"Error occurred during I2C comm to read control regi"
- 322      72206F63 
- 322      63757272 
- 322      65642064 
- 322      7572696E 
- 323 0197 73746572 		.ascii	"ster 4\015\012\000"
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 10
+ 168:main.c        ****     for(;;)
+ 169:main.c        ****     {
+ 170:main.c        ****         if (PacketReadyFlag) {
+ 288              		.loc 1 170 0
+ 289 015a 144B     		ldr	r3, .L20+56
+ 290 015c 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 291 015e 13F0FF0F 		tst	r3, #255
+ 292 0162 FAD0     		beq	.L17
+ 171:main.c        ****             UART_Debug_PutArray(DataBuffer, TRANSMIT_BUFFER_SIZE); /*API to transmit an array of by
+ 293              		.loc 1 171 0
+ 294 0164 0E21     		movs	r1, #14
+ 295 0166 0F48     		ldr	r0, .L20+48
+ 296 0168 FFF7FEFF 		bl	UART_Debug_PutArray
+ 297              	.LVL54:
+ 172:main.c        ****             PacketReadyFlag = 0;
+ 298              		.loc 1 172 0
+ 299 016c 0022     		movs	r2, #0
+ 300 016e 0F4B     		ldr	r3, .L20+56
+ 301 0170 1A70     		strb	r2, [r3]
+ 302 0172 F2E7     		b	.L17
+ 303              	.L21:
+ 304              		.align	2
+ 305              	.L20:
+ 306 0174 00000000 		.word	.LC0
+ 307 0178 20000000 		.word	.LC1
+ 308 017c 40000000 		.word	.LC2
+ 309 0180 7C000000 		.word	.LC3
+ 310 0184 98000000 		.word	.LC4
+ 311 0188 D0000000 		.word	.LC5
+ 312 018c 0C010000 		.word	.LC6
+ 313 0190 44010000 		.word	.LC7
+ 314 0194 64010000 		.word	.LC8
+ 315 0198 A0010000 		.word	.LC9
+ 316 019c D8010000 		.word	.LC10
+ 317 01a0 14020000 		.word	.LC11
+ 318 01a4 00000000 		.word	DataBuffer
+ 319 01a8 00000000 		.word	Custom_TIMER_ISR
+ 320 01ac 00000000 		.word	PacketReadyFlag
+ 321              		.cfi_endproc
+ 322              	.LFE64:
+ 323              		.size	main, .-main
+ 324              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 325              		.align	2
+ 326              	.LC0:
+ 327 0000 44657669 		.ascii	"Device 0x%02X is connected\015\012\000"
+ 327      63652030 
+ 327      78253032 
+ 327      58206973 
+ 327      20636F6E 
+ 328 001d 000000   		.space	3
+ 329              	.LC1:
+ 330 0020 434F4E54 		.ascii	"CONTROL REGISTER 1: 0x%02X\015\012\000"
+ 330      524F4C20 
+ 330      52454749 
+ 330      53544552 
+ 330      20313A20 
+ 331 003d 000000   		.space	3
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 10
 
 
- 323      20340D0A 
- 323      00
- 324              	.LC9:
- 325 01a0 434F4E54 		.ascii	"CONTROL REGISTER 4 successfully written as: 0x%02X\015"
- 325      524F4C20 
- 325      52454749 
- 325      53544552 
- 325      20342073 
- 326 01d3 0A00     		.ascii	"\012\000"
- 327 01d5 000000   		.space	3
- 328              	.LC10:
- 329 01d8 4572726F 		.ascii	"Error occurred during I2C comm to set control regis"
- 329      72206F63 
- 329      63757272 
- 329      65642064 
- 329      7572696E 
- 330 020b 74657220 		.ascii	"ter 4\015\012\000"
- 330      340D0A00 
- 331 0213 00       		.space	1
- 332              	.LC11:
- 333 0214 434F4E54 		.ascii	"CONTROL REGISTER 4 after overwrite operation: 0x%02"
- 333      524F4C20 
- 333      52454749 
- 333      53544552 
- 333      20342061 
- 334 0247 580D0A00 		.ascii	"X\015\012\000"
- 335              		.text
- 336              	.Letext0:
- 337              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
- 338              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
- 339              		.file 4 "ErrorCodes.h"
- 340              		.file 5 "I2C_Interface.h"
- 341              		.file 6 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
- 342              		.file 7 "Generated_Source\\PSoC5/UART_Debug.h"
- 343              		.file 8 "Generated_Source\\PSoC5/CyLib.h"
- 344              		.file 9 "Generated_Source\\PSoC5/core_cm3.h"
- 345              		.section	.debug_info,"",%progbits
- 346              	.Ldebug_info0:
- 347 0000 C1040000 		.4byte	0x4c1
- 348 0004 0400     		.2byte	0x4
- 349 0006 00000000 		.4byte	.Ldebug_abbrev0
- 350 000a 04       		.byte	0x4
- 351 000b 01       		.uleb128 0x1
- 352 000c 64000000 		.4byte	.LASF33
- 353 0010 0C       		.byte	0xc
- 354 0011 47020000 		.4byte	.LASF34
- 355 0015 A2010000 		.4byte	.LASF35
- 356 0019 00000000 		.4byte	.Ldebug_ranges0+0
- 357 001d 00000000 		.4byte	0
- 358 0021 00000000 		.4byte	.Ldebug_line0
- 359 0025 02       		.uleb128 0x2
- 360 0026 01       		.byte	0x1
- 361 0027 06       		.byte	0x6
- 362 0028 94020000 		.4byte	.LASF0
- 363 002c 03       		.uleb128 0x3
- 364 002d 08000000 		.4byte	.LASF4
- 365 0031 02       		.byte	0x2
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 11
+ 332              	.LC2:
+ 333 0040 4572726F 		.ascii	"Error occurred during I2C comm to read control regi"
+ 333      72206F63 
+ 333      63757272 
+ 333      65642064 
+ 333      7572696E 
+ 334 0073 73746572 		.ascii	"ster 1\015\012\000"
+ 334      20310D0A 
+ 334      00
+ 335              	.LC3:
+ 336 007c 0D0A5772 		.ascii	"\015\012Writing new values..\015\012\000"
+ 336      6974696E 
+ 336      67206E65 
+ 336      77207661 
+ 336      6C756573 
+ 337 0095 000000   		.space	3
+ 338              	.LC4:
+ 339 0098 434F4E54 		.ascii	"CONTROL REGISTER 1 successfully written as: 0x%02X\015"
+ 339      524F4C20 
+ 339      52454749 
+ 339      53544552 
+ 339      20312073 
+ 340 00cb 0A00     		.ascii	"\012\000"
+ 341 00cd 000000   		.space	3
+ 342              	.LC5:
+ 343 00d0 4572726F 		.ascii	"Error occurred during I2C comm to set control regis"
+ 343      72206F63 
+ 343      63757272 
+ 343      65642064 
+ 343      7572696E 
+ 344 0103 74657220 		.ascii	"ter 1\015\012\000"
+ 344      310D0A00 
+ 345 010b 00       		.space	1
+ 346              	.LC6:
+ 347 010c 434F4E54 		.ascii	"CONTROL REGISTER 1 after overwrite operation: 0x%02"
+ 347      524F4C20 
+ 347      52454749 
+ 347      53544552 
+ 347      20312061 
+ 348 013f 580D0A00 		.ascii	"X\015\012\000"
+ 349 0143 00       		.space	1
+ 350              	.LC7:
+ 351 0144 434F4E54 		.ascii	"CONTROL REGISTER 4: 0x%02X\015\012\000"
+ 351      524F4C20 
+ 351      52454749 
+ 351      53544552 
+ 351      20343A20 
+ 352 0161 000000   		.space	3
+ 353              	.LC8:
+ 354 0164 4572726F 		.ascii	"Error occurred during I2C comm to read control regi"
+ 354      72206F63 
+ 354      63757272 
+ 354      65642064 
+ 354      7572696E 
+ 355 0197 73746572 		.ascii	"ster 4\015\012\000"
+ 355      20340D0A 
+ 355      00
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 11
 
 
- 366 0032 1D       		.byte	0x1d
- 367 0033 37000000 		.4byte	0x37
- 368 0037 02       		.uleb128 0x2
- 369 0038 01       		.byte	0x1
- 370 0039 08       		.byte	0x8
- 371 003a 56000000 		.4byte	.LASF1
- 372 003e 02       		.uleb128 0x2
- 373 003f 02       		.byte	0x2
- 374 0040 05       		.byte	0x5
- 375 0041 6F020000 		.4byte	.LASF2
- 376 0045 02       		.uleb128 0x2
- 377 0046 02       		.byte	0x2
- 378 0047 07       		.byte	0x7
- 379 0048 04010000 		.4byte	.LASF3
- 380 004c 03       		.uleb128 0x3
- 381 004d 33000000 		.4byte	.LASF5
- 382 0051 02       		.byte	0x2
- 383 0052 3F       		.byte	0x3f
- 384 0053 57000000 		.4byte	0x57
- 385 0057 02       		.uleb128 0x2
- 386 0058 04       		.byte	0x4
- 387 0059 05       		.byte	0x5
- 388 005a 3D000000 		.4byte	.LASF6
- 389 005e 02       		.uleb128 0x2
- 390 005f 04       		.byte	0x4
- 391 0060 07       		.byte	0x7
- 392 0061 F2000000 		.4byte	.LASF7
- 393 0065 02       		.uleb128 0x2
- 394 0066 08       		.byte	0x8
- 395 0067 05       		.byte	0x5
- 396 0068 28020000 		.4byte	.LASF8
- 397 006c 02       		.uleb128 0x2
- 398 006d 08       		.byte	0x8
- 399 006e 07       		.byte	0x7
- 400 006f 83010000 		.4byte	.LASF9
- 401 0073 04       		.uleb128 0x4
- 402 0074 04       		.byte	0x4
- 403 0075 05       		.byte	0x5
- 404 0076 696E7400 		.ascii	"int\000"
- 405 007a 02       		.uleb128 0x2
- 406 007b 04       		.byte	0x4
- 407 007c 07       		.byte	0x7
- 408 007d 76010000 		.4byte	.LASF10
- 409 0081 03       		.uleb128 0x3
- 410 0082 9A010000 		.4byte	.LASF11
- 411 0086 03       		.byte	0x3
- 412 0087 18       		.byte	0x18
- 413 0088 2C000000 		.4byte	0x2c
- 414 008c 03       		.uleb128 0x3
- 415 008d 11020000 		.4byte	.LASF12
- 416 0091 03       		.byte	0x3
- 417 0092 2C       		.byte	0x2c
- 418 0093 4C000000 		.4byte	0x4c
- 419 0097 02       		.uleb128 0x2
- 420 0098 04       		.byte	0x4
- 421 0099 04       		.byte	0x4
- 422 009a 50000000 		.4byte	.LASF13
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 12
+ 356              	.LC9:
+ 357 01a0 434F4E54 		.ascii	"CONTROL REGISTER 4 successfully written as: 0x%02X\015"
+ 357      524F4C20 
+ 357      52454749 
+ 357      53544552 
+ 357      20342073 
+ 358 01d3 0A00     		.ascii	"\012\000"
+ 359 01d5 000000   		.space	3
+ 360              	.LC10:
+ 361 01d8 4572726F 		.ascii	"Error occurred during I2C comm to set control regis"
+ 361      72206F63 
+ 361      63757272 
+ 361      65642064 
+ 361      7572696E 
+ 362 020b 74657220 		.ascii	"ter 4\015\012\000"
+ 362      340D0A00 
+ 363 0213 00       		.space	1
+ 364              	.LC11:
+ 365 0214 434F4E54 		.ascii	"CONTROL REGISTER 4 after overwrite operation: 0x%02"
+ 365      524F4C20 
+ 365      52454749 
+ 365      53544552 
+ 365      20342061 
+ 366 0247 580D0A00 		.ascii	"X\015\012\000"
+ 367              		.text
+ 368              	.Letext0:
+ 369              		.file 2 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 370              		.file 3 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 371              		.file 4 "ErrorCodes.h"
+ 372              		.file 5 "Generated_Source\\PSoC5/core_cm3.h"
+ 373              		.file 6 "InterruptRoutines.h"
+ 374              		.file 7 "I2C_Interface.h"
+ 375              		.file 8 "c:\\program files (x86)\\cypress\\psoc creator\\4.3\\psoc creator\\import\\gnu\\arm\\5.4.
+ 376              		.file 9 "Generated_Source\\PSoC5/UART_Debug.h"
+ 377              		.file 10 "Generated_Source\\PSoC5/CyLib.h"
+ 378              		.file 11 "Generated_Source\\PSoC5/Timer.h"
+ 379              		.file 12 "Generated_Source\\PSoC5/Timer_isr.h"
+ 380              		.section	.debug_info,"",%progbits
+ 381              	.Ldebug_info0:
+ 382 0000 32050000 		.4byte	0x532
+ 383 0004 0400     		.2byte	0x4
+ 384 0006 00000000 		.4byte	.Ldebug_abbrev0
+ 385 000a 04       		.byte	0x4
+ 386 000b 01       		.uleb128 0x1
+ 387 000c 78000000 		.4byte	.LASF39
+ 388 0010 0C       		.byte	0xc
+ 389 0011 79020000 		.4byte	.LASF40
+ 390 0015 C2010000 		.4byte	.LASF41
+ 391 0019 00000000 		.4byte	.Ldebug_ranges0+0
+ 392 001d 00000000 		.4byte	0
+ 393 0021 00000000 		.4byte	.Ldebug_line0
+ 394 0025 02       		.uleb128 0x2
+ 395 0026 01       		.byte	0x1
+ 396 0027 06       		.byte	0x6
+ 397 0028 E1020000 		.4byte	.LASF0
+ 398 002c 03       		.uleb128 0x3
+ 399 002d 08000000 		.4byte	.LASF4
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 12
 
 
- 423 009e 02       		.uleb128 0x2
- 424 009f 08       		.byte	0x8
- 425 00a0 04       		.byte	0x4
- 426 00a1 24010000 		.4byte	.LASF14
- 427 00a5 02       		.uleb128 0x2
- 428 00a6 01       		.byte	0x1
- 429 00a7 08       		.byte	0x8
- 430 00a8 4E020000 		.4byte	.LASF15
- 431 00ac 05       		.uleb128 0x5
- 432 00ad 01       		.byte	0x1
- 433 00ae 37000000 		.4byte	0x37
- 434 00b2 04       		.byte	0x4
- 435 00b3 15       		.byte	0x15
- 436 00b4 C5000000 		.4byte	0xc5
- 437 00b8 06       		.uleb128 0x6
- 438 00b9 79020000 		.4byte	.LASF16
- 439 00bd 00       		.byte	0
- 440 00be 06       		.uleb128 0x6
- 441 00bf 82020000 		.4byte	.LASF17
- 442 00c3 01       		.byte	0x1
- 443 00c4 00       		.byte	0
- 444 00c5 03       		.uleb128 0x3
- 445 00c6 46000000 		.4byte	.LASF18
- 446 00ca 04       		.byte	0x4
- 447 00cb 18       		.byte	0x18
- 448 00cc AC000000 		.4byte	0xac
- 449 00d0 02       		.uleb128 0x2
- 450 00d1 08       		.byte	0x8
- 451 00d2 04       		.byte	0x4
- 452 00d3 88020000 		.4byte	.LASF19
- 453 00d7 02       		.uleb128 0x2
- 454 00d8 04       		.byte	0x4
- 455 00d9 07       		.byte	0x7
- 456 00da 19020000 		.4byte	.LASF20
- 457 00de 07       		.uleb128 0x7
- 458 00df 5D010000 		.4byte	.LASF36
- 459 00e3 01       		.byte	0x1
- 460 00e4 0E       		.byte	0xe
- 461 00e5 73000000 		.4byte	0x73
- 462 00e9 00000000 		.4byte	.LFB64
- 463 00ed 78010000 		.4byte	.LFE64-.LFB64
- 464 00f1 01       		.uleb128 0x1
- 465 00f2 9C       		.byte	0x9c
- 466 00f3 4B040000 		.4byte	0x44b
- 467 00f7 08       		.uleb128 0x8
- 468 00f8 00000000 		.4byte	.LASF21
- 469 00fc 01       		.byte	0x1
- 470 00fd 19       		.byte	0x19
- 471 00fe 4B040000 		.4byte	0x44b
- 472 0102 02       		.uleb128 0x2
- 473 0103 91       		.byte	0x91
- 474 0104 44       		.sleb128 -60
- 475 0105 09       		.uleb128 0x9
- 476 0106 22020000 		.4byte	.LASF22
- 477 010a 01       		.byte	0x1
- 478 010b 1C       		.byte	0x1c
- 479 010c C5000000 		.4byte	0xc5
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 13
+ 400 0031 02       		.byte	0x2
+ 401 0032 1D       		.byte	0x1d
+ 402 0033 37000000 		.4byte	0x37
+ 403 0037 02       		.uleb128 0x2
+ 404 0038 01       		.byte	0x1
+ 405 0039 08       		.byte	0x8
+ 406 003a 6A000000 		.4byte	.LASF1
+ 407 003e 02       		.uleb128 0x2
+ 408 003f 02       		.byte	0x2
+ 409 0040 05       		.byte	0x5
+ 410 0041 A1020000 		.4byte	.LASF2
+ 411 0045 02       		.uleb128 0x2
+ 412 0046 02       		.byte	0x2
+ 413 0047 07       		.byte	0x7
+ 414 0048 18010000 		.4byte	.LASF3
+ 415 004c 03       		.uleb128 0x3
+ 416 004d 33000000 		.4byte	.LASF5
+ 417 0051 02       		.byte	0x2
+ 418 0052 3F       		.byte	0x3f
+ 419 0053 57000000 		.4byte	0x57
+ 420 0057 02       		.uleb128 0x2
+ 421 0058 04       		.byte	0x4
+ 422 0059 05       		.byte	0x5
+ 423 005a 3D000000 		.4byte	.LASF6
+ 424 005e 02       		.uleb128 0x2
+ 425 005f 04       		.byte	0x4
+ 426 0060 07       		.byte	0x7
+ 427 0061 06010000 		.4byte	.LASF7
+ 428 0065 02       		.uleb128 0x2
+ 429 0066 08       		.byte	0x8
+ 430 0067 05       		.byte	0x5
+ 431 0068 5A020000 		.4byte	.LASF8
+ 432 006c 02       		.uleb128 0x2
+ 433 006d 08       		.byte	0x8
+ 434 006e 07       		.byte	0x7
+ 435 006f A3010000 		.4byte	.LASF9
+ 436 0073 04       		.uleb128 0x4
+ 437 0074 04       		.byte	0x4
+ 438 0075 05       		.byte	0x5
+ 439 0076 696E7400 		.ascii	"int\000"
+ 440 007a 02       		.uleb128 0x2
+ 441 007b 04       		.byte	0x4
+ 442 007c 07       		.byte	0x7
+ 443 007d 96010000 		.4byte	.LASF10
+ 444 0081 03       		.uleb128 0x3
+ 445 0082 BA010000 		.4byte	.LASF11
+ 446 0086 03       		.byte	0x3
+ 447 0087 18       		.byte	0x18
+ 448 0088 2C000000 		.4byte	0x2c
+ 449 008c 03       		.uleb128 0x3
+ 450 008d 31020000 		.4byte	.LASF12
+ 451 0091 03       		.byte	0x3
+ 452 0092 2C       		.byte	0x2c
+ 453 0093 4C000000 		.4byte	0x4c
+ 454 0097 02       		.uleb128 0x2
+ 455 0098 04       		.byte	0x4
+ 456 0099 04       		.byte	0x4
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 13
 
 
- 480 0110 00000000 		.4byte	.LLST0
- 481 0114 08       		.uleb128 0x8
- 482 0115 62010000 		.4byte	.LASF23
- 483 0119 01       		.byte	0x1
- 484 011a 2E       		.byte	0x2e
- 485 011b 81000000 		.4byte	0x81
- 486 011f 02       		.uleb128 0x2
- 487 0120 91       		.byte	0x91
- 488 0121 43       		.sleb128 -61
- 489 0122 08       		.uleb128 0x8
- 490 0123 6C010000 		.4byte	.LASF24
- 491 0127 01       		.byte	0x1
- 492 0128 64       		.byte	0x64
- 493 0129 81000000 		.4byte	0x81
- 494 012d 02       		.uleb128 0x2
- 495 012e 91       		.byte	0x91
- 496 012f 42       		.sleb128 -62
- 497 0130 0A       		.uleb128 0xa
- 498 0131 14000000 		.4byte	.LBB2
- 499 0135 22000000 		.4byte	.LBE2-.LBB2
- 500 0139 92010000 		.4byte	0x192
- 501 013d 0B       		.uleb128 0xb
- 502 013e 6900     		.ascii	"i\000"
- 503 0140 01       		.byte	0x1
- 504 0141 1F       		.byte	0x1f
- 505 0142 73000000 		.4byte	0x73
- 506 0146 8C000000 		.4byte	.LLST1
- 507 014a 0C       		.uleb128 0xc
- 508 014b 1E000000 		.4byte	.LVL4
- 509 014f 6C040000 		.4byte	0x46c
- 510 0153 5E010000 		.4byte	0x15e
- 511 0157 0D       		.uleb128 0xd
- 512 0158 01       		.uleb128 0x1
- 513 0159 50       		.byte	0x50
- 514 015a 02       		.uleb128 0x2
- 515 015b 74       		.byte	0x74
- 516 015c 00       		.sleb128 0
- 517 015d 00       		.byte	0
- 518 015e 0C       		.uleb128 0xc
- 519 015f 2A000000 		.4byte	.LVL5
- 520 0163 77040000 		.4byte	0x477
- 521 0167 81010000 		.4byte	0x181
- 522 016b 0D       		.uleb128 0xd
- 523 016c 01       		.uleb128 0x1
- 524 016d 50       		.byte	0x50
- 525 016e 02       		.uleb128 0x2
- 526 016f 91       		.byte	0x91
- 527 0170 44       		.sleb128 -60
- 528 0171 0D       		.uleb128 0xd
- 529 0172 01       		.uleb128 0x1
- 530 0173 51       		.byte	0x51
- 531 0174 05       		.uleb128 0x5
- 532 0175 03       		.byte	0x3
- 533 0176 00000000 		.4byte	.LC0
- 534 017a 0D       		.uleb128 0xd
- 535 017b 01       		.uleb128 0x1
- 536 017c 52       		.byte	0x52
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 14
+ 457 009a 64000000 		.4byte	.LASF13
+ 458 009e 02       		.uleb128 0x2
+ 459 009f 08       		.byte	0x8
+ 460 00a0 04       		.byte	0x4
+ 461 00a1 38010000 		.4byte	.LASF14
+ 462 00a5 02       		.uleb128 0x2
+ 463 00a6 01       		.byte	0x1
+ 464 00a7 08       		.byte	0x8
+ 465 00a8 80020000 		.4byte	.LASF15
+ 466 00ac 05       		.uleb128 0x5
+ 467 00ad 01       		.byte	0x1
+ 468 00ae 37000000 		.4byte	0x37
+ 469 00b2 04       		.byte	0x4
+ 470 00b3 15       		.byte	0x15
+ 471 00b4 C5000000 		.4byte	0xc5
+ 472 00b8 06       		.uleb128 0x6
+ 473 00b9 BB020000 		.4byte	.LASF16
+ 474 00bd 00       		.byte	0
+ 475 00be 06       		.uleb128 0x6
+ 476 00bf C4020000 		.4byte	.LASF17
+ 477 00c3 01       		.byte	0x1
+ 478 00c4 00       		.byte	0
+ 479 00c5 03       		.uleb128 0x3
+ 480 00c6 5A000000 		.4byte	.LASF18
+ 481 00ca 04       		.byte	0x4
+ 482 00cb 18       		.byte	0x18
+ 483 00cc AC000000 		.4byte	0xac
+ 484 00d0 02       		.uleb128 0x2
+ 485 00d1 08       		.byte	0x8
+ 486 00d2 04       		.byte	0x4
+ 487 00d3 D5020000 		.4byte	.LASF19
+ 488 00d7 02       		.uleb128 0x2
+ 489 00d8 04       		.byte	0x4
+ 490 00d9 07       		.byte	0x7
+ 491 00da 39020000 		.4byte	.LASF20
+ 492 00de 07       		.uleb128 0x7
+ 493 00df 81000000 		.4byte	0x81
+ 494 00e3 08       		.uleb128 0x8
+ 495 00e4 71010000 		.4byte	.LASF42
+ 496 00e8 01       		.byte	0x1
+ 497 00e9 0F       		.byte	0xf
+ 498 00ea 73000000 		.4byte	0x73
+ 499 00ee 00000000 		.4byte	.LFB64
+ 500 00f2 B0010000 		.4byte	.LFE64-.LFB64
+ 501 00f6 01       		.uleb128 0x1
+ 502 00f7 9C       		.byte	0x9c
+ 503 00f8 75040000 		.4byte	0x475
+ 504 00fc 09       		.uleb128 0x9
+ 505 00fd 00000000 		.4byte	.LASF21
+ 506 0101 01       		.byte	0x1
+ 507 0102 1A       		.byte	0x1a
+ 508 0103 75040000 		.4byte	0x475
+ 509 0107 02       		.uleb128 0x2
+ 510 0108 91       		.byte	0x91
+ 511 0109 44       		.sleb128 -60
+ 512 010a 0A       		.uleb128 0xa
+ 513 010b 54020000 		.4byte	.LASF22
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 14
 
 
- 537 017d 02       		.uleb128 0x2
- 538 017e 74       		.byte	0x74
- 539 017f 00       		.sleb128 0
- 540 0180 00       		.byte	0
- 541 0181 0E       		.uleb128 0xe
- 542 0182 30000000 		.4byte	.LVL6
- 543 0186 82040000 		.4byte	0x482
- 544 018a 0D       		.uleb128 0xd
- 545 018b 01       		.uleb128 0x1
- 546 018c 50       		.byte	0x50
- 547 018d 02       		.uleb128 0x2
- 548 018e 91       		.byte	0x91
- 549 018f 44       		.sleb128 -60
- 550 0190 00       		.byte	0
- 551 0191 00       		.byte	0
- 552 0192 0F       		.uleb128 0xf
- 553 0193 0A000000 		.4byte	.LVL0
- 554 0197 8D040000 		.4byte	0x48d
- 555 019b 0F       		.uleb128 0xf
- 556 019c 0E000000 		.4byte	.LVL1
- 557 01a0 98040000 		.4byte	0x498
- 558 01a4 0C       		.uleb128 0xc
- 559 01a5 14000000 		.4byte	.LVL2
- 560 01a9 A3040000 		.4byte	0x4a3
- 561 01ad B7010000 		.4byte	0x1b7
- 562 01b1 0D       		.uleb128 0xd
- 563 01b2 01       		.uleb128 0x1
- 564 01b3 50       		.byte	0x50
- 565 01b4 01       		.uleb128 0x1
- 566 01b5 35       		.byte	0x35
- 567 01b6 00       		.byte	0
- 568 01b7 0C       		.uleb128 0xc
- 569 01b8 42000000 		.4byte	.LVL8
- 570 01bc AE040000 		.4byte	0x4ae
- 571 01c0 D6010000 		.4byte	0x1d6
- 572 01c4 0D       		.uleb128 0xd
- 573 01c5 01       		.uleb128 0x1
- 574 01c6 50       		.byte	0x50
- 575 01c7 01       		.uleb128 0x1
- 576 01c8 48       		.byte	0x48
- 577 01c9 0D       		.uleb128 0xd
- 578 01ca 01       		.uleb128 0x1
- 579 01cb 51       		.byte	0x51
- 580 01cc 02       		.uleb128 0x2
- 581 01cd 08       		.byte	0x8
- 582 01ce 20       		.byte	0x20
- 583 01cf 0D       		.uleb128 0xd
- 584 01d0 01       		.uleb128 0x1
- 585 01d1 52       		.byte	0x52
- 586 01d2 02       		.uleb128 0x2
- 587 01d3 91       		.byte	0x91
- 588 01d4 43       		.sleb128 -61
- 589 01d5 00       		.byte	0
- 590 01d6 0C       		.uleb128 0xc
- 591 01d7 50000000 		.4byte	.LVL10
- 592 01db 77040000 		.4byte	0x477
- 593 01df F3010000 		.4byte	0x1f3
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 15
+ 514 010f 01       		.byte	0x1
+ 515 0110 1D       		.byte	0x1d
+ 516 0111 C5000000 		.4byte	0xc5
+ 517 0115 00000000 		.4byte	.LLST0
+ 518 0119 09       		.uleb128 0x9
+ 519 011a 76010000 		.4byte	.LASF23
+ 520 011e 01       		.byte	0x1
+ 521 011f 2F       		.byte	0x2f
+ 522 0120 81000000 		.4byte	0x81
+ 523 0124 02       		.uleb128 0x2
+ 524 0125 91       		.byte	0x91
+ 525 0126 43       		.sleb128 -61
+ 526 0127 09       		.uleb128 0x9
+ 527 0128 8C010000 		.4byte	.LASF24
+ 528 012c 01       		.byte	0x1
+ 529 012d 65       		.byte	0x65
+ 530 012e 81000000 		.4byte	0x81
+ 531 0132 02       		.uleb128 0x2
+ 532 0133 91       		.byte	0x91
+ 533 0134 42       		.sleb128 -62
+ 534 0135 0B       		.uleb128 0xb
+ 535 0136 14000000 		.4byte	.LBB2
+ 536 013a 22000000 		.4byte	.LBE2-.LBB2
+ 537 013e 97010000 		.4byte	0x197
+ 538 0142 0C       		.uleb128 0xc
+ 539 0143 6900     		.ascii	"i\000"
+ 540 0145 01       		.byte	0x1
+ 541 0146 20       		.byte	0x20
+ 542 0147 73000000 		.4byte	0x73
+ 543 014b 8C000000 		.4byte	.LLST1
+ 544 014f 0D       		.uleb128 0xd
+ 545 0150 1E000000 		.4byte	.LVL4
+ 546 0154 BC040000 		.4byte	0x4bc
+ 547 0158 63010000 		.4byte	0x163
+ 548 015c 0E       		.uleb128 0xe
+ 549 015d 01       		.uleb128 0x1
+ 550 015e 50       		.byte	0x50
+ 551 015f 02       		.uleb128 0x2
+ 552 0160 74       		.byte	0x74
+ 553 0161 00       		.sleb128 0
+ 554 0162 00       		.byte	0
+ 555 0163 0D       		.uleb128 0xd
+ 556 0164 2A000000 		.4byte	.LVL5
+ 557 0168 C7040000 		.4byte	0x4c7
+ 558 016c 86010000 		.4byte	0x186
+ 559 0170 0E       		.uleb128 0xe
+ 560 0171 01       		.uleb128 0x1
+ 561 0172 50       		.byte	0x50
+ 562 0173 02       		.uleb128 0x2
+ 563 0174 91       		.byte	0x91
+ 564 0175 44       		.sleb128 -60
+ 565 0176 0E       		.uleb128 0xe
+ 566 0177 01       		.uleb128 0x1
+ 567 0178 51       		.byte	0x51
+ 568 0179 05       		.uleb128 0x5
+ 569 017a 03       		.byte	0x3
+ 570 017b 00000000 		.4byte	.LC0
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 15
 
 
- 594 01e3 0D       		.uleb128 0xd
- 595 01e4 01       		.uleb128 0x1
- 596 01e5 50       		.byte	0x50
- 597 01e6 02       		.uleb128 0x2
- 598 01e7 91       		.byte	0x91
- 599 01e8 44       		.sleb128 -60
- 600 01e9 0D       		.uleb128 0xd
- 601 01ea 01       		.uleb128 0x1
- 602 01eb 51       		.byte	0x51
- 603 01ec 05       		.uleb128 0x5
- 604 01ed 03       		.byte	0x3
- 605 01ee 20000000 		.4byte	.LC1
- 606 01f2 00       		.byte	0
- 607 01f3 0C       		.uleb128 0xc
- 608 01f4 56000000 		.4byte	.LVL11
- 609 01f8 82040000 		.4byte	0x482
- 610 01fc 07020000 		.4byte	0x207
- 611 0200 0D       		.uleb128 0xd
- 612 0201 01       		.uleb128 0x1
- 613 0202 50       		.byte	0x50
- 614 0203 02       		.uleb128 0x2
- 615 0204 91       		.byte	0x91
- 616 0205 44       		.sleb128 -60
- 617 0206 00       		.byte	0
- 618 0207 0C       		.uleb128 0xc
- 619 0208 5E000000 		.4byte	.LVL14
- 620 020c 82040000 		.4byte	0x482
- 621 0210 1E020000 		.4byte	0x21e
- 622 0214 0D       		.uleb128 0xd
- 623 0215 01       		.uleb128 0x1
- 624 0216 50       		.byte	0x50
- 625 0217 05       		.uleb128 0x5
- 626 0218 03       		.byte	0x3
- 627 0219 40000000 		.4byte	.LC2
- 628 021d 00       		.byte	0
- 629 021e 0C       		.uleb128 0xc
- 630 021f 6C000000 		.4byte	.LVL15
- 631 0223 82040000 		.4byte	0x482
- 632 0227 35020000 		.4byte	0x235
- 633 022b 0D       		.uleb128 0xd
- 634 022c 01       		.uleb128 0x1
- 635 022d 50       		.byte	0x50
- 636 022e 05       		.uleb128 0x5
- 637 022f 03       		.byte	0x3
- 638 0230 7C000000 		.4byte	.LC3
- 639 0234 00       		.byte	0
- 640 0235 0C       		.uleb128 0xc
- 641 0236 7A000000 		.4byte	.LVL16
- 642 023a B9040000 		.4byte	0x4b9
- 643 023e 54020000 		.4byte	0x254
- 644 0242 0D       		.uleb128 0xd
- 645 0243 01       		.uleb128 0x1
- 646 0244 50       		.byte	0x50
- 647 0245 01       		.uleb128 0x1
- 648 0246 48       		.byte	0x48
- 649 0247 0D       		.uleb128 0xd
- 650 0248 01       		.uleb128 0x1
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 16
+ 571 017f 0E       		.uleb128 0xe
+ 572 0180 01       		.uleb128 0x1
+ 573 0181 52       		.byte	0x52
+ 574 0182 02       		.uleb128 0x2
+ 575 0183 74       		.byte	0x74
+ 576 0184 00       		.sleb128 0
+ 577 0185 00       		.byte	0
+ 578 0186 0F       		.uleb128 0xf
+ 579 0187 30000000 		.4byte	.LVL6
+ 580 018b D2040000 		.4byte	0x4d2
+ 581 018f 0E       		.uleb128 0xe
+ 582 0190 01       		.uleb128 0x1
+ 583 0191 50       		.byte	0x50
+ 584 0192 02       		.uleb128 0x2
+ 585 0193 91       		.byte	0x91
+ 586 0194 44       		.sleb128 -60
+ 587 0195 00       		.byte	0
+ 588 0196 00       		.byte	0
+ 589 0197 10       		.uleb128 0x10
+ 590 0198 0A000000 		.4byte	.LVL0
+ 591 019c DD040000 		.4byte	0x4dd
+ 592 01a0 10       		.uleb128 0x10
+ 593 01a1 0E000000 		.4byte	.LVL1
+ 594 01a5 E8040000 		.4byte	0x4e8
+ 595 01a9 0D       		.uleb128 0xd
+ 596 01aa 14000000 		.4byte	.LVL2
+ 597 01ae F3040000 		.4byte	0x4f3
+ 598 01b2 BC010000 		.4byte	0x1bc
+ 599 01b6 0E       		.uleb128 0xe
+ 600 01b7 01       		.uleb128 0x1
+ 601 01b8 50       		.byte	0x50
+ 602 01b9 01       		.uleb128 0x1
+ 603 01ba 35       		.byte	0x35
+ 604 01bb 00       		.byte	0
+ 605 01bc 0D       		.uleb128 0xd
+ 606 01bd 42000000 		.4byte	.LVL8
+ 607 01c1 FE040000 		.4byte	0x4fe
+ 608 01c5 DB010000 		.4byte	0x1db
+ 609 01c9 0E       		.uleb128 0xe
+ 610 01ca 01       		.uleb128 0x1
+ 611 01cb 50       		.byte	0x50
+ 612 01cc 01       		.uleb128 0x1
+ 613 01cd 48       		.byte	0x48
+ 614 01ce 0E       		.uleb128 0xe
+ 615 01cf 01       		.uleb128 0x1
+ 616 01d0 51       		.byte	0x51
+ 617 01d1 02       		.uleb128 0x2
+ 618 01d2 08       		.byte	0x8
+ 619 01d3 20       		.byte	0x20
+ 620 01d4 0E       		.uleb128 0xe
+ 621 01d5 01       		.uleb128 0x1
+ 622 01d6 52       		.byte	0x52
+ 623 01d7 02       		.uleb128 0x2
+ 624 01d8 91       		.byte	0x91
+ 625 01d9 43       		.sleb128 -61
+ 626 01da 00       		.byte	0
+ 627 01db 0D       		.uleb128 0xd
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 16
 
 
- 651 0249 51       		.byte	0x51
- 652 024a 02       		.uleb128 0x2
- 653 024b 08       		.byte	0x8
- 654 024c 20       		.byte	0x20
- 655 024d 0D       		.uleb128 0xd
- 656 024e 01       		.uleb128 0x1
- 657 024f 52       		.byte	0x52
- 658 0250 02       		.uleb128 0x2
- 659 0251 08       		.byte	0x8
- 660 0252 57       		.byte	0x57
- 661 0253 00       		.byte	0
- 662 0254 0C       		.uleb128 0xc
- 663 0255 88000000 		.4byte	.LVL18
- 664 0259 77040000 		.4byte	0x477
- 665 025d 71020000 		.4byte	0x271
- 666 0261 0D       		.uleb128 0xd
- 667 0262 01       		.uleb128 0x1
- 668 0263 50       		.byte	0x50
- 669 0264 02       		.uleb128 0x2
- 670 0265 91       		.byte	0x91
- 671 0266 44       		.sleb128 -60
- 672 0267 0D       		.uleb128 0xd
- 673 0268 01       		.uleb128 0x1
- 674 0269 51       		.byte	0x51
- 675 026a 05       		.uleb128 0x5
- 676 026b 03       		.byte	0x3
- 677 026c 98000000 		.4byte	.LC4
- 678 0270 00       		.byte	0
- 679 0271 0C       		.uleb128 0xc
- 680 0272 8E000000 		.4byte	.LVL19
- 681 0276 82040000 		.4byte	0x482
- 682 027a 85020000 		.4byte	0x285
- 683 027e 0D       		.uleb128 0xd
- 684 027f 01       		.uleb128 0x1
- 685 0280 50       		.byte	0x50
- 686 0281 02       		.uleb128 0x2
- 687 0282 91       		.byte	0x91
- 688 0283 44       		.sleb128 -60
- 689 0284 00       		.byte	0
- 690 0285 0C       		.uleb128 0xc
- 691 0286 96000000 		.4byte	.LVL22
- 692 028a 82040000 		.4byte	0x482
- 693 028e 9C020000 		.4byte	0x29c
- 694 0292 0D       		.uleb128 0xd
- 695 0293 01       		.uleb128 0x1
- 696 0294 50       		.byte	0x50
- 697 0295 05       		.uleb128 0x5
- 698 0296 03       		.byte	0x3
- 699 0297 D0000000 		.4byte	.LC5
- 700 029b 00       		.byte	0
- 701 029c 0C       		.uleb128 0xc
- 702 029d A2000000 		.4byte	.LVL23
- 703 02a1 AE040000 		.4byte	0x4ae
- 704 02a5 BB020000 		.4byte	0x2bb
- 705 02a9 0D       		.uleb128 0xd
- 706 02aa 01       		.uleb128 0x1
- 707 02ab 50       		.byte	0x50
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 17
+ 628 01dc 50000000 		.4byte	.LVL10
+ 629 01e0 C7040000 		.4byte	0x4c7
+ 630 01e4 F8010000 		.4byte	0x1f8
+ 631 01e8 0E       		.uleb128 0xe
+ 632 01e9 01       		.uleb128 0x1
+ 633 01ea 50       		.byte	0x50
+ 634 01eb 02       		.uleb128 0x2
+ 635 01ec 91       		.byte	0x91
+ 636 01ed 44       		.sleb128 -60
+ 637 01ee 0E       		.uleb128 0xe
+ 638 01ef 01       		.uleb128 0x1
+ 639 01f0 51       		.byte	0x51
+ 640 01f1 05       		.uleb128 0x5
+ 641 01f2 03       		.byte	0x3
+ 642 01f3 20000000 		.4byte	.LC1
+ 643 01f7 00       		.byte	0
+ 644 01f8 0D       		.uleb128 0xd
+ 645 01f9 56000000 		.4byte	.LVL11
+ 646 01fd D2040000 		.4byte	0x4d2
+ 647 0201 0C020000 		.4byte	0x20c
+ 648 0205 0E       		.uleb128 0xe
+ 649 0206 01       		.uleb128 0x1
+ 650 0207 50       		.byte	0x50
+ 651 0208 02       		.uleb128 0x2
+ 652 0209 91       		.byte	0x91
+ 653 020a 44       		.sleb128 -60
+ 654 020b 00       		.byte	0
+ 655 020c 0D       		.uleb128 0xd
+ 656 020d 5E000000 		.4byte	.LVL14
+ 657 0211 D2040000 		.4byte	0x4d2
+ 658 0215 23020000 		.4byte	0x223
+ 659 0219 0E       		.uleb128 0xe
+ 660 021a 01       		.uleb128 0x1
+ 661 021b 50       		.byte	0x50
+ 662 021c 05       		.uleb128 0x5
+ 663 021d 03       		.byte	0x3
+ 664 021e 40000000 		.4byte	.LC2
+ 665 0222 00       		.byte	0
+ 666 0223 0D       		.uleb128 0xd
+ 667 0224 6C000000 		.4byte	.LVL15
+ 668 0228 D2040000 		.4byte	0x4d2
+ 669 022c 3A020000 		.4byte	0x23a
+ 670 0230 0E       		.uleb128 0xe
+ 671 0231 01       		.uleb128 0x1
+ 672 0232 50       		.byte	0x50
+ 673 0233 05       		.uleb128 0x5
+ 674 0234 03       		.byte	0x3
+ 675 0235 7C000000 		.4byte	.LC3
+ 676 0239 00       		.byte	0
+ 677 023a 0D       		.uleb128 0xd
+ 678 023b 7A000000 		.4byte	.LVL16
+ 679 023f 09050000 		.4byte	0x509
+ 680 0243 59020000 		.4byte	0x259
+ 681 0247 0E       		.uleb128 0xe
+ 682 0248 01       		.uleb128 0x1
+ 683 0249 50       		.byte	0x50
+ 684 024a 01       		.uleb128 0x1
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 17
 
 
- 708 02ac 01       		.uleb128 0x1
- 709 02ad 48       		.byte	0x48
- 710 02ae 0D       		.uleb128 0xd
- 711 02af 01       		.uleb128 0x1
- 712 02b0 51       		.byte	0x51
- 713 02b1 02       		.uleb128 0x2
- 714 02b2 08       		.byte	0x8
- 715 02b3 20       		.byte	0x20
- 716 02b4 0D       		.uleb128 0xd
- 717 02b5 01       		.uleb128 0x1
- 718 02b6 52       		.byte	0x52
- 719 02b7 02       		.uleb128 0x2
- 720 02b8 91       		.byte	0x91
- 721 02b9 43       		.sleb128 -61
- 722 02ba 00       		.byte	0
- 723 02bb 0C       		.uleb128 0xc
- 724 02bc B0000000 		.4byte	.LVL25
- 725 02c0 77040000 		.4byte	0x477
- 726 02c4 D8020000 		.4byte	0x2d8
- 727 02c8 0D       		.uleb128 0xd
- 728 02c9 01       		.uleb128 0x1
- 729 02ca 50       		.byte	0x50
- 730 02cb 02       		.uleb128 0x2
- 731 02cc 91       		.byte	0x91
- 732 02cd 44       		.sleb128 -60
- 733 02ce 0D       		.uleb128 0xd
- 734 02cf 01       		.uleb128 0x1
- 735 02d0 51       		.byte	0x51
- 736 02d1 05       		.uleb128 0x5
- 737 02d2 03       		.byte	0x3
- 738 02d3 0C010000 		.4byte	.LC6
- 739 02d7 00       		.byte	0
- 740 02d8 0C       		.uleb128 0xc
- 741 02d9 B6000000 		.4byte	.LVL26
- 742 02dd 82040000 		.4byte	0x482
- 743 02e1 EC020000 		.4byte	0x2ec
- 744 02e5 0D       		.uleb128 0xd
- 745 02e6 01       		.uleb128 0x1
- 746 02e7 50       		.byte	0x50
- 747 02e8 02       		.uleb128 0x2
- 748 02e9 91       		.byte	0x91
- 749 02ea 44       		.sleb128 -60
- 750 02eb 00       		.byte	0
- 751 02ec 0C       		.uleb128 0xc
- 752 02ed BE000000 		.4byte	.LVL29
- 753 02f1 82040000 		.4byte	0x482
- 754 02f5 03030000 		.4byte	0x303
- 755 02f9 0D       		.uleb128 0xd
- 756 02fa 01       		.uleb128 0x1
- 757 02fb 50       		.byte	0x50
- 758 02fc 05       		.uleb128 0x5
- 759 02fd 03       		.byte	0x3
- 760 02fe 40000000 		.4byte	.LC2
- 761 0302 00       		.byte	0
- 762 0303 0C       		.uleb128 0xc
- 763 0304 CA000000 		.4byte	.LVL30
- 764 0308 AE040000 		.4byte	0x4ae
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 18
+ 685 024b 48       		.byte	0x48
+ 686 024c 0E       		.uleb128 0xe
+ 687 024d 01       		.uleb128 0x1
+ 688 024e 51       		.byte	0x51
+ 689 024f 02       		.uleb128 0x2
+ 690 0250 08       		.byte	0x8
+ 691 0251 20       		.byte	0x20
+ 692 0252 0E       		.uleb128 0xe
+ 693 0253 01       		.uleb128 0x1
+ 694 0254 52       		.byte	0x52
+ 695 0255 02       		.uleb128 0x2
+ 696 0256 08       		.byte	0x8
+ 697 0257 57       		.byte	0x57
+ 698 0258 00       		.byte	0
+ 699 0259 0D       		.uleb128 0xd
+ 700 025a 88000000 		.4byte	.LVL18
+ 701 025e C7040000 		.4byte	0x4c7
+ 702 0262 76020000 		.4byte	0x276
+ 703 0266 0E       		.uleb128 0xe
+ 704 0267 01       		.uleb128 0x1
+ 705 0268 50       		.byte	0x50
+ 706 0269 02       		.uleb128 0x2
+ 707 026a 91       		.byte	0x91
+ 708 026b 44       		.sleb128 -60
+ 709 026c 0E       		.uleb128 0xe
+ 710 026d 01       		.uleb128 0x1
+ 711 026e 51       		.byte	0x51
+ 712 026f 05       		.uleb128 0x5
+ 713 0270 03       		.byte	0x3
+ 714 0271 98000000 		.4byte	.LC4
+ 715 0275 00       		.byte	0
+ 716 0276 0D       		.uleb128 0xd
+ 717 0277 8E000000 		.4byte	.LVL19
+ 718 027b D2040000 		.4byte	0x4d2
+ 719 027f 8A020000 		.4byte	0x28a
+ 720 0283 0E       		.uleb128 0xe
+ 721 0284 01       		.uleb128 0x1
+ 722 0285 50       		.byte	0x50
+ 723 0286 02       		.uleb128 0x2
+ 724 0287 91       		.byte	0x91
+ 725 0288 44       		.sleb128 -60
+ 726 0289 00       		.byte	0
+ 727 028a 0D       		.uleb128 0xd
+ 728 028b 96000000 		.4byte	.LVL22
+ 729 028f D2040000 		.4byte	0x4d2
+ 730 0293 A1020000 		.4byte	0x2a1
+ 731 0297 0E       		.uleb128 0xe
+ 732 0298 01       		.uleb128 0x1
+ 733 0299 50       		.byte	0x50
+ 734 029a 05       		.uleb128 0x5
+ 735 029b 03       		.byte	0x3
+ 736 029c D0000000 		.4byte	.LC5
+ 737 02a0 00       		.byte	0
+ 738 02a1 0D       		.uleb128 0xd
+ 739 02a2 A2000000 		.4byte	.LVL23
+ 740 02a6 FE040000 		.4byte	0x4fe
+ 741 02aa C0020000 		.4byte	0x2c0
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 18
 
 
- 765 030c 22030000 		.4byte	0x322
- 766 0310 0D       		.uleb128 0xd
- 767 0311 01       		.uleb128 0x1
- 768 0312 50       		.byte	0x50
- 769 0313 01       		.uleb128 0x1
- 770 0314 48       		.byte	0x48
- 771 0315 0D       		.uleb128 0xd
- 772 0316 01       		.uleb128 0x1
- 773 0317 51       		.byte	0x51
- 774 0318 02       		.uleb128 0x2
- 775 0319 08       		.byte	0x8
- 776 031a 23       		.byte	0x23
- 777 031b 0D       		.uleb128 0xd
- 778 031c 01       		.uleb128 0x1
- 779 031d 52       		.byte	0x52
- 780 031e 02       		.uleb128 0x2
- 781 031f 91       		.byte	0x91
- 782 0320 42       		.sleb128 -62
- 783 0321 00       		.byte	0
- 784 0322 0C       		.uleb128 0xc
- 785 0323 D8000000 		.4byte	.LVL32
- 786 0327 77040000 		.4byte	0x477
- 787 032b 3F030000 		.4byte	0x33f
- 788 032f 0D       		.uleb128 0xd
- 789 0330 01       		.uleb128 0x1
- 790 0331 50       		.byte	0x50
- 791 0332 02       		.uleb128 0x2
- 792 0333 91       		.byte	0x91
- 793 0334 44       		.sleb128 -60
- 794 0335 0D       		.uleb128 0xd
- 795 0336 01       		.uleb128 0x1
- 796 0337 51       		.byte	0x51
- 797 0338 05       		.uleb128 0x5
- 798 0339 03       		.byte	0x3
- 799 033a 44010000 		.4byte	.LC7
- 800 033e 00       		.byte	0
- 801 033f 0C       		.uleb128 0xc
- 802 0340 DE000000 		.4byte	.LVL33
- 803 0344 82040000 		.4byte	0x482
- 804 0348 53030000 		.4byte	0x353
- 805 034c 0D       		.uleb128 0xd
- 806 034d 01       		.uleb128 0x1
- 807 034e 50       		.byte	0x50
- 808 034f 02       		.uleb128 0x2
- 809 0350 91       		.byte	0x91
- 810 0351 44       		.sleb128 -60
- 811 0352 00       		.byte	0
- 812 0353 0C       		.uleb128 0xc
- 813 0354 E6000000 		.4byte	.LVL36
- 814 0358 82040000 		.4byte	0x482
- 815 035c 6A030000 		.4byte	0x36a
- 816 0360 0D       		.uleb128 0xd
- 817 0361 01       		.uleb128 0x1
- 818 0362 50       		.byte	0x50
- 819 0363 05       		.uleb128 0x5
- 820 0364 03       		.byte	0x3
- 821 0365 64010000 		.4byte	.LC8
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 19
+ 742 02ae 0E       		.uleb128 0xe
+ 743 02af 01       		.uleb128 0x1
+ 744 02b0 50       		.byte	0x50
+ 745 02b1 01       		.uleb128 0x1
+ 746 02b2 48       		.byte	0x48
+ 747 02b3 0E       		.uleb128 0xe
+ 748 02b4 01       		.uleb128 0x1
+ 749 02b5 51       		.byte	0x51
+ 750 02b6 02       		.uleb128 0x2
+ 751 02b7 08       		.byte	0x8
+ 752 02b8 20       		.byte	0x20
+ 753 02b9 0E       		.uleb128 0xe
+ 754 02ba 01       		.uleb128 0x1
+ 755 02bb 52       		.byte	0x52
+ 756 02bc 02       		.uleb128 0x2
+ 757 02bd 91       		.byte	0x91
+ 758 02be 43       		.sleb128 -61
+ 759 02bf 00       		.byte	0
+ 760 02c0 0D       		.uleb128 0xd
+ 761 02c1 B0000000 		.4byte	.LVL25
+ 762 02c5 C7040000 		.4byte	0x4c7
+ 763 02c9 DD020000 		.4byte	0x2dd
+ 764 02cd 0E       		.uleb128 0xe
+ 765 02ce 01       		.uleb128 0x1
+ 766 02cf 50       		.byte	0x50
+ 767 02d0 02       		.uleb128 0x2
+ 768 02d1 91       		.byte	0x91
+ 769 02d2 44       		.sleb128 -60
+ 770 02d3 0E       		.uleb128 0xe
+ 771 02d4 01       		.uleb128 0x1
+ 772 02d5 51       		.byte	0x51
+ 773 02d6 05       		.uleb128 0x5
+ 774 02d7 03       		.byte	0x3
+ 775 02d8 0C010000 		.4byte	.LC6
+ 776 02dc 00       		.byte	0
+ 777 02dd 0D       		.uleb128 0xd
+ 778 02de B6000000 		.4byte	.LVL26
+ 779 02e2 D2040000 		.4byte	0x4d2
+ 780 02e6 F1020000 		.4byte	0x2f1
+ 781 02ea 0E       		.uleb128 0xe
+ 782 02eb 01       		.uleb128 0x1
+ 783 02ec 50       		.byte	0x50
+ 784 02ed 02       		.uleb128 0x2
+ 785 02ee 91       		.byte	0x91
+ 786 02ef 44       		.sleb128 -60
+ 787 02f0 00       		.byte	0
+ 788 02f1 0D       		.uleb128 0xd
+ 789 02f2 BE000000 		.4byte	.LVL29
+ 790 02f6 D2040000 		.4byte	0x4d2
+ 791 02fa 08030000 		.4byte	0x308
+ 792 02fe 0E       		.uleb128 0xe
+ 793 02ff 01       		.uleb128 0x1
+ 794 0300 50       		.byte	0x50
+ 795 0301 05       		.uleb128 0x5
+ 796 0302 03       		.byte	0x3
+ 797 0303 40000000 		.4byte	.LC2
+ 798 0307 00       		.byte	0
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 19
 
 
- 822 0369 00       		.byte	0
- 823 036a 0C       		.uleb128 0xc
- 824 036b F4000000 		.4byte	.LVL37
- 825 036f 82040000 		.4byte	0x482
- 826 0373 81030000 		.4byte	0x381
- 827 0377 0D       		.uleb128 0xd
- 828 0378 01       		.uleb128 0x1
- 829 0379 50       		.byte	0x50
- 830 037a 05       		.uleb128 0x5
- 831 037b 03       		.byte	0x3
- 832 037c 7C000000 		.4byte	.LC3
- 833 0380 00       		.byte	0
- 834 0381 0C       		.uleb128 0xc
- 835 0382 02010000 		.4byte	.LVL38
- 836 0386 B9040000 		.4byte	0x4b9
- 837 038a 9F030000 		.4byte	0x39f
- 838 038e 0D       		.uleb128 0xd
- 839 038f 01       		.uleb128 0x1
- 840 0390 50       		.byte	0x50
- 841 0391 01       		.uleb128 0x1
- 842 0392 48       		.byte	0x48
- 843 0393 0D       		.uleb128 0xd
- 844 0394 01       		.uleb128 0x1
- 845 0395 51       		.byte	0x51
- 846 0396 02       		.uleb128 0x2
- 847 0397 08       		.byte	0x8
- 848 0398 23       		.byte	0x23
- 849 0399 0D       		.uleb128 0xd
- 850 039a 01       		.uleb128 0x1
- 851 039b 52       		.byte	0x52
- 852 039c 01       		.uleb128 0x1
- 853 039d 48       		.byte	0x48
- 854 039e 00       		.byte	0
- 855 039f 0C       		.uleb128 0xc
- 856 03a0 10010000 		.4byte	.LVL40
- 857 03a4 77040000 		.4byte	0x477
- 858 03a8 BC030000 		.4byte	0x3bc
- 859 03ac 0D       		.uleb128 0xd
- 860 03ad 01       		.uleb128 0x1
- 861 03ae 50       		.byte	0x50
- 862 03af 02       		.uleb128 0x2
- 863 03b0 91       		.byte	0x91
- 864 03b1 44       		.sleb128 -60
- 865 03b2 0D       		.uleb128 0xd
- 866 03b3 01       		.uleb128 0x1
- 867 03b4 51       		.byte	0x51
- 868 03b5 05       		.uleb128 0x5
- 869 03b6 03       		.byte	0x3
- 870 03b7 A0010000 		.4byte	.LC9
- 871 03bb 00       		.byte	0
- 872 03bc 0C       		.uleb128 0xc
- 873 03bd 16010000 		.4byte	.LVL41
- 874 03c1 82040000 		.4byte	0x482
- 875 03c5 D0030000 		.4byte	0x3d0
- 876 03c9 0D       		.uleb128 0xd
- 877 03ca 01       		.uleb128 0x1
- 878 03cb 50       		.byte	0x50
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 20
+ 799 0308 0D       		.uleb128 0xd
+ 800 0309 CA000000 		.4byte	.LVL30
+ 801 030d FE040000 		.4byte	0x4fe
+ 802 0311 27030000 		.4byte	0x327
+ 803 0315 0E       		.uleb128 0xe
+ 804 0316 01       		.uleb128 0x1
+ 805 0317 50       		.byte	0x50
+ 806 0318 01       		.uleb128 0x1
+ 807 0319 48       		.byte	0x48
+ 808 031a 0E       		.uleb128 0xe
+ 809 031b 01       		.uleb128 0x1
+ 810 031c 51       		.byte	0x51
+ 811 031d 02       		.uleb128 0x2
+ 812 031e 08       		.byte	0x8
+ 813 031f 23       		.byte	0x23
+ 814 0320 0E       		.uleb128 0xe
+ 815 0321 01       		.uleb128 0x1
+ 816 0322 52       		.byte	0x52
+ 817 0323 02       		.uleb128 0x2
+ 818 0324 91       		.byte	0x91
+ 819 0325 42       		.sleb128 -62
+ 820 0326 00       		.byte	0
+ 821 0327 0D       		.uleb128 0xd
+ 822 0328 D8000000 		.4byte	.LVL32
+ 823 032c C7040000 		.4byte	0x4c7
+ 824 0330 44030000 		.4byte	0x344
+ 825 0334 0E       		.uleb128 0xe
+ 826 0335 01       		.uleb128 0x1
+ 827 0336 50       		.byte	0x50
+ 828 0337 02       		.uleb128 0x2
+ 829 0338 91       		.byte	0x91
+ 830 0339 44       		.sleb128 -60
+ 831 033a 0E       		.uleb128 0xe
+ 832 033b 01       		.uleb128 0x1
+ 833 033c 51       		.byte	0x51
+ 834 033d 05       		.uleb128 0x5
+ 835 033e 03       		.byte	0x3
+ 836 033f 44010000 		.4byte	.LC7
+ 837 0343 00       		.byte	0
+ 838 0344 0D       		.uleb128 0xd
+ 839 0345 DE000000 		.4byte	.LVL33
+ 840 0349 D2040000 		.4byte	0x4d2
+ 841 034d 58030000 		.4byte	0x358
+ 842 0351 0E       		.uleb128 0xe
+ 843 0352 01       		.uleb128 0x1
+ 844 0353 50       		.byte	0x50
+ 845 0354 02       		.uleb128 0x2
+ 846 0355 91       		.byte	0x91
+ 847 0356 44       		.sleb128 -60
+ 848 0357 00       		.byte	0
+ 849 0358 0D       		.uleb128 0xd
+ 850 0359 E6000000 		.4byte	.LVL36
+ 851 035d D2040000 		.4byte	0x4d2
+ 852 0361 6F030000 		.4byte	0x36f
+ 853 0365 0E       		.uleb128 0xe
+ 854 0366 01       		.uleb128 0x1
+ 855 0367 50       		.byte	0x50
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 20
 
 
- 879 03cc 02       		.uleb128 0x2
- 880 03cd 91       		.byte	0x91
- 881 03ce 44       		.sleb128 -60
- 882 03cf 00       		.byte	0
- 883 03d0 0C       		.uleb128 0xc
- 884 03d1 1E010000 		.4byte	.LVL44
- 885 03d5 82040000 		.4byte	0x482
- 886 03d9 E7030000 		.4byte	0x3e7
- 887 03dd 0D       		.uleb128 0xd
- 888 03de 01       		.uleb128 0x1
- 889 03df 50       		.byte	0x50
- 890 03e0 05       		.uleb128 0x5
- 891 03e1 03       		.byte	0x3
- 892 03e2 D8010000 		.4byte	.LC10
- 893 03e6 00       		.byte	0
- 894 03e7 0C       		.uleb128 0xc
- 895 03e8 2A010000 		.4byte	.LVL45
- 896 03ec AE040000 		.4byte	0x4ae
- 897 03f0 06040000 		.4byte	0x406
- 898 03f4 0D       		.uleb128 0xd
- 899 03f5 01       		.uleb128 0x1
- 900 03f6 50       		.byte	0x50
- 901 03f7 01       		.uleb128 0x1
- 902 03f8 48       		.byte	0x48
- 903 03f9 0D       		.uleb128 0xd
- 904 03fa 01       		.uleb128 0x1
- 905 03fb 51       		.byte	0x51
- 906 03fc 02       		.uleb128 0x2
- 907 03fd 08       		.byte	0x8
- 908 03fe 23       		.byte	0x23
- 909 03ff 0D       		.uleb128 0xd
- 910 0400 01       		.uleb128 0x1
- 911 0401 52       		.byte	0x52
- 912 0402 02       		.uleb128 0x2
- 913 0403 91       		.byte	0x91
- 914 0404 42       		.sleb128 -62
- 915 0405 00       		.byte	0
- 916 0406 0C       		.uleb128 0xc
- 917 0407 38010000 		.4byte	.LVL47
- 918 040b 77040000 		.4byte	0x477
- 919 040f 23040000 		.4byte	0x423
- 920 0413 0D       		.uleb128 0xd
- 921 0414 01       		.uleb128 0x1
- 922 0415 50       		.byte	0x50
- 923 0416 02       		.uleb128 0x2
- 924 0417 91       		.byte	0x91
- 925 0418 44       		.sleb128 -60
- 926 0419 0D       		.uleb128 0xd
- 927 041a 01       		.uleb128 0x1
- 928 041b 51       		.byte	0x51
- 929 041c 05       		.uleb128 0x5
- 930 041d 03       		.byte	0x3
- 931 041e 14020000 		.4byte	.LC11
- 932 0422 00       		.byte	0
- 933 0423 0C       		.uleb128 0xc
- 934 0424 3E010000 		.4byte	.LVL48
- 935 0428 82040000 		.4byte	0x482
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 21
+ 856 0368 05       		.uleb128 0x5
+ 857 0369 03       		.byte	0x3
+ 858 036a 64010000 		.4byte	.LC8
+ 859 036e 00       		.byte	0
+ 860 036f 0D       		.uleb128 0xd
+ 861 0370 F4000000 		.4byte	.LVL37
+ 862 0374 D2040000 		.4byte	0x4d2
+ 863 0378 86030000 		.4byte	0x386
+ 864 037c 0E       		.uleb128 0xe
+ 865 037d 01       		.uleb128 0x1
+ 866 037e 50       		.byte	0x50
+ 867 037f 05       		.uleb128 0x5
+ 868 0380 03       		.byte	0x3
+ 869 0381 7C000000 		.4byte	.LC3
+ 870 0385 00       		.byte	0
+ 871 0386 0D       		.uleb128 0xd
+ 872 0387 02010000 		.4byte	.LVL38
+ 873 038b 09050000 		.4byte	0x509
+ 874 038f A4030000 		.4byte	0x3a4
+ 875 0393 0E       		.uleb128 0xe
+ 876 0394 01       		.uleb128 0x1
+ 877 0395 50       		.byte	0x50
+ 878 0396 01       		.uleb128 0x1
+ 879 0397 48       		.byte	0x48
+ 880 0398 0E       		.uleb128 0xe
+ 881 0399 01       		.uleb128 0x1
+ 882 039a 51       		.byte	0x51
+ 883 039b 02       		.uleb128 0x2
+ 884 039c 08       		.byte	0x8
+ 885 039d 23       		.byte	0x23
+ 886 039e 0E       		.uleb128 0xe
+ 887 039f 01       		.uleb128 0x1
+ 888 03a0 52       		.byte	0x52
+ 889 03a1 01       		.uleb128 0x1
+ 890 03a2 48       		.byte	0x48
+ 891 03a3 00       		.byte	0
+ 892 03a4 0D       		.uleb128 0xd
+ 893 03a5 10010000 		.4byte	.LVL40
+ 894 03a9 C7040000 		.4byte	0x4c7
+ 895 03ad C1030000 		.4byte	0x3c1
+ 896 03b1 0E       		.uleb128 0xe
+ 897 03b2 01       		.uleb128 0x1
+ 898 03b3 50       		.byte	0x50
+ 899 03b4 02       		.uleb128 0x2
+ 900 03b5 91       		.byte	0x91
+ 901 03b6 44       		.sleb128 -60
+ 902 03b7 0E       		.uleb128 0xe
+ 903 03b8 01       		.uleb128 0x1
+ 904 03b9 51       		.byte	0x51
+ 905 03ba 05       		.uleb128 0x5
+ 906 03bb 03       		.byte	0x3
+ 907 03bc A0010000 		.4byte	.LC9
+ 908 03c0 00       		.byte	0
+ 909 03c1 0D       		.uleb128 0xd
+ 910 03c2 16010000 		.4byte	.LVL41
+ 911 03c6 D2040000 		.4byte	0x4d2
+ 912 03ca D5030000 		.4byte	0x3d5
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 21
 
 
- 936 042c 37040000 		.4byte	0x437
- 937 0430 0D       		.uleb128 0xd
- 938 0431 01       		.uleb128 0x1
- 939 0432 50       		.byte	0x50
- 940 0433 02       		.uleb128 0x2
- 941 0434 91       		.byte	0x91
- 942 0435 44       		.sleb128 -60
- 943 0436 00       		.byte	0
- 944 0437 0E       		.uleb128 0xe
- 945 0438 46010000 		.4byte	.LVL51
- 946 043c 82040000 		.4byte	0x482
- 947 0440 0D       		.uleb128 0xd
- 948 0441 01       		.uleb128 0x1
- 949 0442 50       		.byte	0x50
- 950 0443 05       		.uleb128 0x5
- 951 0444 03       		.byte	0x3
- 952 0445 64010000 		.4byte	.LC8
- 953 0449 00       		.byte	0
- 954 044a 00       		.byte	0
- 955 044b 10       		.uleb128 0x10
- 956 044c A5000000 		.4byte	0xa5
- 957 0450 5B040000 		.4byte	0x45b
- 958 0454 11       		.uleb128 0x11
- 959 0455 D7000000 		.4byte	0xd7
- 960 0459 31       		.byte	0x31
- 961 045a 00       		.byte	0
- 962 045b 12       		.uleb128 0x12
- 963 045c 17010000 		.4byte	.LASF37
- 964 0460 09       		.byte	0x9
- 965 0461 1207     		.2byte	0x712
- 966 0463 67040000 		.4byte	0x467
- 967 0467 13       		.uleb128 0x13
- 968 0468 8C000000 		.4byte	0x8c
- 969 046c 14       		.uleb128 0x14
- 970 046d 12000000 		.4byte	.LASF25
- 971 0471 12000000 		.4byte	.LASF25
- 972 0475 05       		.byte	0x5
- 973 0476 5D       		.byte	0x5d
- 974 0477 14       		.uleb128 0x14
- 975 0478 A0020000 		.4byte	.LASF26
- 976 047c A0020000 		.4byte	.LASF26
- 977 0480 06       		.byte	0x6
- 978 0481 E7       		.byte	0xe7
- 979 0482 14       		.uleb128 0x14
- 980 0483 2B010000 		.4byte	.LASF27
- 981 0487 2B010000 		.4byte	.LASF27
- 982 048b 07       		.byte	0x7
- 983 048c 8B       		.byte	0x8b
- 984 048d 14       		.uleb128 0x14
- 985 048e B0020000 		.4byte	.LASF28
- 986 0492 B0020000 		.4byte	.LASF28
- 987 0496 05       		.byte	0x5
- 988 0497 17       		.byte	0x17
- 989 0498 14       		.uleb128 0x14
- 990 0499 36020000 		.4byte	.LASF29
- 991 049d 36020000 		.4byte	.LASF29
- 992 04a1 07       		.byte	0x7
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 22
+ 913 03ce 0E       		.uleb128 0xe
+ 914 03cf 01       		.uleb128 0x1
+ 915 03d0 50       		.byte	0x50
+ 916 03d1 02       		.uleb128 0x2
+ 917 03d2 91       		.byte	0x91
+ 918 03d3 44       		.sleb128 -60
+ 919 03d4 00       		.byte	0
+ 920 03d5 0D       		.uleb128 0xd
+ 921 03d6 1E010000 		.4byte	.LVL44
+ 922 03da D2040000 		.4byte	0x4d2
+ 923 03de EC030000 		.4byte	0x3ec
+ 924 03e2 0E       		.uleb128 0xe
+ 925 03e3 01       		.uleb128 0x1
+ 926 03e4 50       		.byte	0x50
+ 927 03e5 05       		.uleb128 0x5
+ 928 03e6 03       		.byte	0x3
+ 929 03e7 D8010000 		.4byte	.LC10
+ 930 03eb 00       		.byte	0
+ 931 03ec 0D       		.uleb128 0xd
+ 932 03ed 2A010000 		.4byte	.LVL45
+ 933 03f1 FE040000 		.4byte	0x4fe
+ 934 03f5 0B040000 		.4byte	0x40b
+ 935 03f9 0E       		.uleb128 0xe
+ 936 03fa 01       		.uleb128 0x1
+ 937 03fb 50       		.byte	0x50
+ 938 03fc 01       		.uleb128 0x1
+ 939 03fd 48       		.byte	0x48
+ 940 03fe 0E       		.uleb128 0xe
+ 941 03ff 01       		.uleb128 0x1
+ 942 0400 51       		.byte	0x51
+ 943 0401 02       		.uleb128 0x2
+ 944 0402 08       		.byte	0x8
+ 945 0403 23       		.byte	0x23
+ 946 0404 0E       		.uleb128 0xe
+ 947 0405 01       		.uleb128 0x1
+ 948 0406 52       		.byte	0x52
+ 949 0407 02       		.uleb128 0x2
+ 950 0408 91       		.byte	0x91
+ 951 0409 42       		.sleb128 -62
+ 952 040a 00       		.byte	0
+ 953 040b 0D       		.uleb128 0xd
+ 954 040c 38010000 		.4byte	.LVL47
+ 955 0410 C7040000 		.4byte	0x4c7
+ 956 0414 28040000 		.4byte	0x428
+ 957 0418 0E       		.uleb128 0xe
+ 958 0419 01       		.uleb128 0x1
+ 959 041a 50       		.byte	0x50
+ 960 041b 02       		.uleb128 0x2
+ 961 041c 91       		.byte	0x91
+ 962 041d 44       		.sleb128 -60
+ 963 041e 0E       		.uleb128 0xe
+ 964 041f 01       		.uleb128 0x1
+ 965 0420 51       		.byte	0x51
+ 966 0421 05       		.uleb128 0x5
+ 967 0422 03       		.byte	0x3
+ 968 0423 14020000 		.4byte	.LC11
+ 969 0427 00       		.byte	0
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 22
 
 
- 993 04a2 54       		.byte	0x54
- 994 04a3 14       		.uleb128 0x14
- 995 04a4 A8020000 		.4byte	.LASF30
- 996 04a8 A8020000 		.4byte	.LASF30
- 997 04ac 08       		.byte	0x8
- 998 04ad 76       		.byte	0x76
- 999 04ae 14       		.uleb128 0x14
- 1000 04af 53020000 		.4byte	.LASF31
- 1001 04b3 53020000 		.4byte	.LASF31
- 1002 04b7 05       		.byte	0x5
- 1003 04b8 28       		.byte	0x28
- 1004 04b9 14       		.uleb128 0x14
- 1005 04ba 40010000 		.4byte	.LASF32
- 1006 04be 40010000 		.4byte	.LASF32
- 1007 04c2 05       		.byte	0x5
- 1008 04c3 43       		.byte	0x43
- 1009 04c4 00       		.byte	0
- 1010              		.section	.debug_abbrev,"",%progbits
- 1011              	.Ldebug_abbrev0:
- 1012 0000 01       		.uleb128 0x1
- 1013 0001 11       		.uleb128 0x11
- 1014 0002 01       		.byte	0x1
- 1015 0003 25       		.uleb128 0x25
- 1016 0004 0E       		.uleb128 0xe
- 1017 0005 13       		.uleb128 0x13
- 1018 0006 0B       		.uleb128 0xb
- 1019 0007 03       		.uleb128 0x3
- 1020 0008 0E       		.uleb128 0xe
- 1021 0009 1B       		.uleb128 0x1b
- 1022 000a 0E       		.uleb128 0xe
- 1023 000b 55       		.uleb128 0x55
- 1024 000c 17       		.uleb128 0x17
- 1025 000d 11       		.uleb128 0x11
- 1026 000e 01       		.uleb128 0x1
- 1027 000f 10       		.uleb128 0x10
- 1028 0010 17       		.uleb128 0x17
- 1029 0011 00       		.byte	0
- 1030 0012 00       		.byte	0
- 1031 0013 02       		.uleb128 0x2
- 1032 0014 24       		.uleb128 0x24
- 1033 0015 00       		.byte	0
- 1034 0016 0B       		.uleb128 0xb
- 1035 0017 0B       		.uleb128 0xb
- 1036 0018 3E       		.uleb128 0x3e
- 1037 0019 0B       		.uleb128 0xb
- 1038 001a 03       		.uleb128 0x3
- 1039 001b 0E       		.uleb128 0xe
- 1040 001c 00       		.byte	0
- 1041 001d 00       		.byte	0
- 1042 001e 03       		.uleb128 0x3
- 1043 001f 16       		.uleb128 0x16
- 1044 0020 00       		.byte	0
- 1045 0021 03       		.uleb128 0x3
- 1046 0022 0E       		.uleb128 0xe
- 1047 0023 3A       		.uleb128 0x3a
- 1048 0024 0B       		.uleb128 0xb
- 1049 0025 3B       		.uleb128 0x3b
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 23
+ 970 0428 0D       		.uleb128 0xd
+ 971 0429 3E010000 		.4byte	.LVL48
+ 972 042d D2040000 		.4byte	0x4d2
+ 973 0431 3C040000 		.4byte	0x43c
+ 974 0435 0E       		.uleb128 0xe
+ 975 0436 01       		.uleb128 0x1
+ 976 0437 50       		.byte	0x50
+ 977 0438 02       		.uleb128 0x2
+ 978 0439 91       		.byte	0x91
+ 979 043a 44       		.sleb128 -60
+ 980 043b 00       		.byte	0
+ 981 043c 0D       		.uleb128 0xd
+ 982 043d 46010000 		.4byte	.LVL51
+ 983 0441 D2040000 		.4byte	0x4d2
+ 984 0445 53040000 		.4byte	0x453
+ 985 0449 0E       		.uleb128 0xe
+ 986 044a 01       		.uleb128 0x1
+ 987 044b 50       		.byte	0x50
+ 988 044c 05       		.uleb128 0x5
+ 989 044d 03       		.byte	0x3
+ 990 044e 64010000 		.4byte	.LC8
+ 991 0452 00       		.byte	0
+ 992 0453 10       		.uleb128 0x10
+ 993 0454 54010000 		.4byte	.LVL52
+ 994 0458 14050000 		.4byte	0x514
+ 995 045c 10       		.uleb128 0x10
+ 996 045d 5A010000 		.4byte	.LVL53
+ 997 0461 1F050000 		.4byte	0x51f
+ 998 0465 0F       		.uleb128 0xf
+ 999 0466 6C010000 		.4byte	.LVL54
+ 1000 046a 2A050000 		.4byte	0x52a
+ 1001 046e 0E       		.uleb128 0xe
+ 1002 046f 01       		.uleb128 0x1
+ 1003 0470 51       		.byte	0x51
+ 1004 0471 01       		.uleb128 0x1
+ 1005 0472 3E       		.byte	0x3e
+ 1006 0473 00       		.byte	0
+ 1007 0474 00       		.byte	0
+ 1008 0475 11       		.uleb128 0x11
+ 1009 0476 A5000000 		.4byte	0xa5
+ 1010 047a 85040000 		.4byte	0x485
+ 1011 047e 12       		.uleb128 0x12
+ 1012 047f D7000000 		.4byte	0xd7
+ 1013 0483 31       		.byte	0x31
+ 1014 0484 00       		.byte	0
+ 1015 0485 13       		.uleb128 0x13
+ 1016 0486 2B010000 		.4byte	.LASF25
+ 1017 048a 05       		.byte	0x5
+ 1018 048b 1207     		.2byte	0x712
+ 1019 048d 91040000 		.4byte	0x491
+ 1020 0491 07       		.uleb128 0x7
+ 1021 0492 8C000000 		.4byte	0x8c
+ 1022 0496 11       		.uleb128 0x11
+ 1023 0497 81000000 		.4byte	0x81
+ 1024 049b A6040000 		.4byte	0x4a6
+ 1025 049f 12       		.uleb128 0x12
+ 1026 04a0 D7000000 		.4byte	0xd7
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 23
 
 
- 1050 0026 0B       		.uleb128 0xb
- 1051 0027 49       		.uleb128 0x49
- 1052 0028 13       		.uleb128 0x13
- 1053 0029 00       		.byte	0
- 1054 002a 00       		.byte	0
- 1055 002b 04       		.uleb128 0x4
- 1056 002c 24       		.uleb128 0x24
- 1057 002d 00       		.byte	0
- 1058 002e 0B       		.uleb128 0xb
- 1059 002f 0B       		.uleb128 0xb
- 1060 0030 3E       		.uleb128 0x3e
- 1061 0031 0B       		.uleb128 0xb
- 1062 0032 03       		.uleb128 0x3
- 1063 0033 08       		.uleb128 0x8
- 1064 0034 00       		.byte	0
- 1065 0035 00       		.byte	0
- 1066 0036 05       		.uleb128 0x5
- 1067 0037 04       		.uleb128 0x4
- 1068 0038 01       		.byte	0x1
- 1069 0039 0B       		.uleb128 0xb
- 1070 003a 0B       		.uleb128 0xb
- 1071 003b 49       		.uleb128 0x49
- 1072 003c 13       		.uleb128 0x13
- 1073 003d 3A       		.uleb128 0x3a
- 1074 003e 0B       		.uleb128 0xb
- 1075 003f 3B       		.uleb128 0x3b
- 1076 0040 0B       		.uleb128 0xb
- 1077 0041 01       		.uleb128 0x1
- 1078 0042 13       		.uleb128 0x13
- 1079 0043 00       		.byte	0
- 1080 0044 00       		.byte	0
- 1081 0045 06       		.uleb128 0x6
- 1082 0046 28       		.uleb128 0x28
- 1083 0047 00       		.byte	0
- 1084 0048 03       		.uleb128 0x3
- 1085 0049 0E       		.uleb128 0xe
- 1086 004a 1C       		.uleb128 0x1c
- 1087 004b 0B       		.uleb128 0xb
- 1088 004c 00       		.byte	0
- 1089 004d 00       		.byte	0
- 1090 004e 07       		.uleb128 0x7
- 1091 004f 2E       		.uleb128 0x2e
- 1092 0050 01       		.byte	0x1
- 1093 0051 3F       		.uleb128 0x3f
- 1094 0052 19       		.uleb128 0x19
- 1095 0053 03       		.uleb128 0x3
- 1096 0054 0E       		.uleb128 0xe
- 1097 0055 3A       		.uleb128 0x3a
- 1098 0056 0B       		.uleb128 0xb
- 1099 0057 3B       		.uleb128 0x3b
- 1100 0058 0B       		.uleb128 0xb
- 1101 0059 27       		.uleb128 0x27
- 1102 005a 19       		.uleb128 0x19
- 1103 005b 49       		.uleb128 0x49
- 1104 005c 13       		.uleb128 0x13
- 1105 005d 8701     		.uleb128 0x87
- 1106 005f 19       		.uleb128 0x19
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 24
+ 1027 04a4 0D       		.byte	0xd
+ 1028 04a5 00       		.byte	0
+ 1029 04a6 14       		.uleb128 0x14
+ 1030 04a7 CA020000 		.4byte	.LASF26
+ 1031 04ab 06       		.byte	0x6
+ 1032 04ac 12       		.byte	0x12
+ 1033 04ad 96040000 		.4byte	0x496
+ 1034 04b1 14       		.uleb128 0x14
+ 1035 04b2 AB020000 		.4byte	.LASF27
+ 1036 04b6 06       		.byte	0x6
+ 1037 04b7 14       		.byte	0x14
+ 1038 04b8 DE000000 		.4byte	0xde
+ 1039 04bc 15       		.uleb128 0x15
+ 1040 04bd 12000000 		.4byte	.LASF28
+ 1041 04c1 12000000 		.4byte	.LASF28
+ 1042 04c5 07       		.byte	0x7
+ 1043 04c6 5D       		.byte	0x5d
+ 1044 04c7 15       		.uleb128 0x15
+ 1045 04c8 ED020000 		.4byte	.LASF29
+ 1046 04cc ED020000 		.4byte	.LASF29
+ 1047 04d0 08       		.byte	0x8
+ 1048 04d1 E7       		.byte	0xe7
+ 1049 04d2 15       		.uleb128 0x15
+ 1050 04d3 3F010000 		.4byte	.LASF30
+ 1051 04d7 3F010000 		.4byte	.LASF30
+ 1052 04db 09       		.byte	0x9
+ 1053 04dc 8B       		.byte	0x8b
+ 1054 04dd 15       		.uleb128 0x15
+ 1055 04de FD020000 		.4byte	.LASF31
+ 1056 04e2 FD020000 		.4byte	.LASF31
+ 1057 04e6 07       		.byte	0x7
+ 1058 04e7 17       		.byte	0x17
+ 1059 04e8 15       		.uleb128 0x15
+ 1060 04e9 68020000 		.4byte	.LASF32
+ 1061 04ed 68020000 		.4byte	.LASF32
+ 1062 04f1 09       		.byte	0x9
+ 1063 04f2 54       		.byte	0x54
+ 1064 04f3 15       		.uleb128 0x15
+ 1065 04f4 F5020000 		.4byte	.LASF33
+ 1066 04f8 F5020000 		.4byte	.LASF33
+ 1067 04fc 0A       		.byte	0xa
+ 1068 04fd 76       		.byte	0x76
+ 1069 04fe 15       		.uleb128 0x15
+ 1070 04ff 85020000 		.4byte	.LASF34
+ 1071 0503 85020000 		.4byte	.LASF34
+ 1072 0507 07       		.byte	0x7
+ 1073 0508 28       		.byte	0x28
+ 1074 0509 15       		.uleb128 0x15
+ 1075 050a 54010000 		.4byte	.LASF35
+ 1076 050e 54010000 		.4byte	.LASF35
+ 1077 0512 07       		.byte	0x7
+ 1078 0513 43       		.byte	0x43
+ 1079 0514 15       		.uleb128 0x15
+ 1080 0515 80010000 		.4byte	.LASF36
+ 1081 0519 80010000 		.4byte	.LASF36
+ 1082 051d 0B       		.byte	0xb
+ 1083 051e 5A       		.byte	0x5a
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 24
 
 
- 1107 0060 11       		.uleb128 0x11
- 1108 0061 01       		.uleb128 0x1
- 1109 0062 12       		.uleb128 0x12
- 1110 0063 06       		.uleb128 0x6
- 1111 0064 40       		.uleb128 0x40
- 1112 0065 18       		.uleb128 0x18
- 1113 0066 9742     		.uleb128 0x2117
- 1114 0068 19       		.uleb128 0x19
- 1115 0069 01       		.uleb128 0x1
- 1116 006a 13       		.uleb128 0x13
- 1117 006b 00       		.byte	0
- 1118 006c 00       		.byte	0
- 1119 006d 08       		.uleb128 0x8
- 1120 006e 34       		.uleb128 0x34
- 1121 006f 00       		.byte	0
- 1122 0070 03       		.uleb128 0x3
- 1123 0071 0E       		.uleb128 0xe
- 1124 0072 3A       		.uleb128 0x3a
- 1125 0073 0B       		.uleb128 0xb
- 1126 0074 3B       		.uleb128 0x3b
- 1127 0075 0B       		.uleb128 0xb
- 1128 0076 49       		.uleb128 0x49
- 1129 0077 13       		.uleb128 0x13
- 1130 0078 02       		.uleb128 0x2
- 1131 0079 18       		.uleb128 0x18
- 1132 007a 00       		.byte	0
- 1133 007b 00       		.byte	0
- 1134 007c 09       		.uleb128 0x9
- 1135 007d 34       		.uleb128 0x34
- 1136 007e 00       		.byte	0
- 1137 007f 03       		.uleb128 0x3
- 1138 0080 0E       		.uleb128 0xe
- 1139 0081 3A       		.uleb128 0x3a
- 1140 0082 0B       		.uleb128 0xb
- 1141 0083 3B       		.uleb128 0x3b
- 1142 0084 0B       		.uleb128 0xb
- 1143 0085 49       		.uleb128 0x49
- 1144 0086 13       		.uleb128 0x13
- 1145 0087 02       		.uleb128 0x2
- 1146 0088 17       		.uleb128 0x17
- 1147 0089 00       		.byte	0
- 1148 008a 00       		.byte	0
- 1149 008b 0A       		.uleb128 0xa
- 1150 008c 0B       		.uleb128 0xb
- 1151 008d 01       		.byte	0x1
- 1152 008e 11       		.uleb128 0x11
- 1153 008f 01       		.uleb128 0x1
- 1154 0090 12       		.uleb128 0x12
- 1155 0091 06       		.uleb128 0x6
- 1156 0092 01       		.uleb128 0x1
- 1157 0093 13       		.uleb128 0x13
- 1158 0094 00       		.byte	0
- 1159 0095 00       		.byte	0
- 1160 0096 0B       		.uleb128 0xb
- 1161 0097 34       		.uleb128 0x34
- 1162 0098 00       		.byte	0
- 1163 0099 03       		.uleb128 0x3
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 25
+ 1084 051f 15       		.uleb128 0x15
+ 1085 0520 42020000 		.4byte	.LASF37
+ 1086 0524 42020000 		.4byte	.LASF37
+ 1087 0528 0C       		.byte	0xc
+ 1088 0529 18       		.byte	0x18
+ 1089 052a 15       		.uleb128 0x15
+ 1090 052b 46000000 		.4byte	.LASF38
+ 1091 052f 46000000 		.4byte	.LASF38
+ 1092 0533 09       		.byte	0x9
+ 1093 0534 8C       		.byte	0x8c
+ 1094 0535 00       		.byte	0
+ 1095              		.section	.debug_abbrev,"",%progbits
+ 1096              	.Ldebug_abbrev0:
+ 1097 0000 01       		.uleb128 0x1
+ 1098 0001 11       		.uleb128 0x11
+ 1099 0002 01       		.byte	0x1
+ 1100 0003 25       		.uleb128 0x25
+ 1101 0004 0E       		.uleb128 0xe
+ 1102 0005 13       		.uleb128 0x13
+ 1103 0006 0B       		.uleb128 0xb
+ 1104 0007 03       		.uleb128 0x3
+ 1105 0008 0E       		.uleb128 0xe
+ 1106 0009 1B       		.uleb128 0x1b
+ 1107 000a 0E       		.uleb128 0xe
+ 1108 000b 55       		.uleb128 0x55
+ 1109 000c 17       		.uleb128 0x17
+ 1110 000d 11       		.uleb128 0x11
+ 1111 000e 01       		.uleb128 0x1
+ 1112 000f 10       		.uleb128 0x10
+ 1113 0010 17       		.uleb128 0x17
+ 1114 0011 00       		.byte	0
+ 1115 0012 00       		.byte	0
+ 1116 0013 02       		.uleb128 0x2
+ 1117 0014 24       		.uleb128 0x24
+ 1118 0015 00       		.byte	0
+ 1119 0016 0B       		.uleb128 0xb
+ 1120 0017 0B       		.uleb128 0xb
+ 1121 0018 3E       		.uleb128 0x3e
+ 1122 0019 0B       		.uleb128 0xb
+ 1123 001a 03       		.uleb128 0x3
+ 1124 001b 0E       		.uleb128 0xe
+ 1125 001c 00       		.byte	0
+ 1126 001d 00       		.byte	0
+ 1127 001e 03       		.uleb128 0x3
+ 1128 001f 16       		.uleb128 0x16
+ 1129 0020 00       		.byte	0
+ 1130 0021 03       		.uleb128 0x3
+ 1131 0022 0E       		.uleb128 0xe
+ 1132 0023 3A       		.uleb128 0x3a
+ 1133 0024 0B       		.uleb128 0xb
+ 1134 0025 3B       		.uleb128 0x3b
+ 1135 0026 0B       		.uleb128 0xb
+ 1136 0027 49       		.uleb128 0x49
+ 1137 0028 13       		.uleb128 0x13
+ 1138 0029 00       		.byte	0
+ 1139 002a 00       		.byte	0
+ 1140 002b 04       		.uleb128 0x4
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 25
 
 
- 1164 009a 08       		.uleb128 0x8
- 1165 009b 3A       		.uleb128 0x3a
- 1166 009c 0B       		.uleb128 0xb
- 1167 009d 3B       		.uleb128 0x3b
- 1168 009e 0B       		.uleb128 0xb
- 1169 009f 49       		.uleb128 0x49
- 1170 00a0 13       		.uleb128 0x13
- 1171 00a1 02       		.uleb128 0x2
- 1172 00a2 17       		.uleb128 0x17
- 1173 00a3 00       		.byte	0
- 1174 00a4 00       		.byte	0
- 1175 00a5 0C       		.uleb128 0xc
- 1176 00a6 898201   		.uleb128 0x4109
- 1177 00a9 01       		.byte	0x1
- 1178 00aa 11       		.uleb128 0x11
- 1179 00ab 01       		.uleb128 0x1
- 1180 00ac 31       		.uleb128 0x31
- 1181 00ad 13       		.uleb128 0x13
- 1182 00ae 01       		.uleb128 0x1
- 1183 00af 13       		.uleb128 0x13
- 1184 00b0 00       		.byte	0
- 1185 00b1 00       		.byte	0
- 1186 00b2 0D       		.uleb128 0xd
- 1187 00b3 8A8201   		.uleb128 0x410a
- 1188 00b6 00       		.byte	0
- 1189 00b7 02       		.uleb128 0x2
- 1190 00b8 18       		.uleb128 0x18
- 1191 00b9 9142     		.uleb128 0x2111
- 1192 00bb 18       		.uleb128 0x18
- 1193 00bc 00       		.byte	0
- 1194 00bd 00       		.byte	0
- 1195 00be 0E       		.uleb128 0xe
- 1196 00bf 898201   		.uleb128 0x4109
- 1197 00c2 01       		.byte	0x1
- 1198 00c3 11       		.uleb128 0x11
- 1199 00c4 01       		.uleb128 0x1
- 1200 00c5 31       		.uleb128 0x31
- 1201 00c6 13       		.uleb128 0x13
- 1202 00c7 00       		.byte	0
- 1203 00c8 00       		.byte	0
- 1204 00c9 0F       		.uleb128 0xf
- 1205 00ca 898201   		.uleb128 0x4109
- 1206 00cd 00       		.byte	0
- 1207 00ce 11       		.uleb128 0x11
- 1208 00cf 01       		.uleb128 0x1
- 1209 00d0 31       		.uleb128 0x31
- 1210 00d1 13       		.uleb128 0x13
- 1211 00d2 00       		.byte	0
- 1212 00d3 00       		.byte	0
- 1213 00d4 10       		.uleb128 0x10
- 1214 00d5 01       		.uleb128 0x1
- 1215 00d6 01       		.byte	0x1
- 1216 00d7 49       		.uleb128 0x49
- 1217 00d8 13       		.uleb128 0x13
- 1218 00d9 01       		.uleb128 0x1
- 1219 00da 13       		.uleb128 0x13
- 1220 00db 00       		.byte	0
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 26
+ 1141 002c 24       		.uleb128 0x24
+ 1142 002d 00       		.byte	0
+ 1143 002e 0B       		.uleb128 0xb
+ 1144 002f 0B       		.uleb128 0xb
+ 1145 0030 3E       		.uleb128 0x3e
+ 1146 0031 0B       		.uleb128 0xb
+ 1147 0032 03       		.uleb128 0x3
+ 1148 0033 08       		.uleb128 0x8
+ 1149 0034 00       		.byte	0
+ 1150 0035 00       		.byte	0
+ 1151 0036 05       		.uleb128 0x5
+ 1152 0037 04       		.uleb128 0x4
+ 1153 0038 01       		.byte	0x1
+ 1154 0039 0B       		.uleb128 0xb
+ 1155 003a 0B       		.uleb128 0xb
+ 1156 003b 49       		.uleb128 0x49
+ 1157 003c 13       		.uleb128 0x13
+ 1158 003d 3A       		.uleb128 0x3a
+ 1159 003e 0B       		.uleb128 0xb
+ 1160 003f 3B       		.uleb128 0x3b
+ 1161 0040 0B       		.uleb128 0xb
+ 1162 0041 01       		.uleb128 0x1
+ 1163 0042 13       		.uleb128 0x13
+ 1164 0043 00       		.byte	0
+ 1165 0044 00       		.byte	0
+ 1166 0045 06       		.uleb128 0x6
+ 1167 0046 28       		.uleb128 0x28
+ 1168 0047 00       		.byte	0
+ 1169 0048 03       		.uleb128 0x3
+ 1170 0049 0E       		.uleb128 0xe
+ 1171 004a 1C       		.uleb128 0x1c
+ 1172 004b 0B       		.uleb128 0xb
+ 1173 004c 00       		.byte	0
+ 1174 004d 00       		.byte	0
+ 1175 004e 07       		.uleb128 0x7
+ 1176 004f 35       		.uleb128 0x35
+ 1177 0050 00       		.byte	0
+ 1178 0051 49       		.uleb128 0x49
+ 1179 0052 13       		.uleb128 0x13
+ 1180 0053 00       		.byte	0
+ 1181 0054 00       		.byte	0
+ 1182 0055 08       		.uleb128 0x8
+ 1183 0056 2E       		.uleb128 0x2e
+ 1184 0057 01       		.byte	0x1
+ 1185 0058 3F       		.uleb128 0x3f
+ 1186 0059 19       		.uleb128 0x19
+ 1187 005a 03       		.uleb128 0x3
+ 1188 005b 0E       		.uleb128 0xe
+ 1189 005c 3A       		.uleb128 0x3a
+ 1190 005d 0B       		.uleb128 0xb
+ 1191 005e 3B       		.uleb128 0x3b
+ 1192 005f 0B       		.uleb128 0xb
+ 1193 0060 27       		.uleb128 0x27
+ 1194 0061 19       		.uleb128 0x19
+ 1195 0062 49       		.uleb128 0x49
+ 1196 0063 13       		.uleb128 0x13
+ 1197 0064 8701     		.uleb128 0x87
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 26
 
 
- 1221 00dc 00       		.byte	0
- 1222 00dd 11       		.uleb128 0x11
- 1223 00de 21       		.uleb128 0x21
- 1224 00df 00       		.byte	0
- 1225 00e0 49       		.uleb128 0x49
- 1226 00e1 13       		.uleb128 0x13
- 1227 00e2 2F       		.uleb128 0x2f
- 1228 00e3 0B       		.uleb128 0xb
- 1229 00e4 00       		.byte	0
- 1230 00e5 00       		.byte	0
- 1231 00e6 12       		.uleb128 0x12
- 1232 00e7 34       		.uleb128 0x34
- 1233 00e8 00       		.byte	0
- 1234 00e9 03       		.uleb128 0x3
- 1235 00ea 0E       		.uleb128 0xe
- 1236 00eb 3A       		.uleb128 0x3a
- 1237 00ec 0B       		.uleb128 0xb
- 1238 00ed 3B       		.uleb128 0x3b
- 1239 00ee 05       		.uleb128 0x5
- 1240 00ef 49       		.uleb128 0x49
- 1241 00f0 13       		.uleb128 0x13
- 1242 00f1 3F       		.uleb128 0x3f
- 1243 00f2 19       		.uleb128 0x19
- 1244 00f3 3C       		.uleb128 0x3c
- 1245 00f4 19       		.uleb128 0x19
- 1246 00f5 00       		.byte	0
- 1247 00f6 00       		.byte	0
- 1248 00f7 13       		.uleb128 0x13
- 1249 00f8 35       		.uleb128 0x35
- 1250 00f9 00       		.byte	0
- 1251 00fa 49       		.uleb128 0x49
- 1252 00fb 13       		.uleb128 0x13
- 1253 00fc 00       		.byte	0
- 1254 00fd 00       		.byte	0
- 1255 00fe 14       		.uleb128 0x14
- 1256 00ff 2E       		.uleb128 0x2e
- 1257 0100 00       		.byte	0
- 1258 0101 3F       		.uleb128 0x3f
- 1259 0102 19       		.uleb128 0x19
- 1260 0103 3C       		.uleb128 0x3c
- 1261 0104 19       		.uleb128 0x19
- 1262 0105 6E       		.uleb128 0x6e
- 1263 0106 0E       		.uleb128 0xe
- 1264 0107 03       		.uleb128 0x3
- 1265 0108 0E       		.uleb128 0xe
- 1266 0109 3A       		.uleb128 0x3a
- 1267 010a 0B       		.uleb128 0xb
- 1268 010b 3B       		.uleb128 0x3b
- 1269 010c 0B       		.uleb128 0xb
- 1270 010d 00       		.byte	0
- 1271 010e 00       		.byte	0
- 1272 010f 00       		.byte	0
- 1273              		.section	.debug_loc,"",%progbits
- 1274              	.Ldebug_loc0:
- 1275              	.LLST0:
- 1276 0000 42000000 		.4byte	.LVL8
- 1277 0004 4C000000 		.4byte	.LVL9
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 27
+ 1198 0066 19       		.uleb128 0x19
+ 1199 0067 11       		.uleb128 0x11
+ 1200 0068 01       		.uleb128 0x1
+ 1201 0069 12       		.uleb128 0x12
+ 1202 006a 06       		.uleb128 0x6
+ 1203 006b 40       		.uleb128 0x40
+ 1204 006c 18       		.uleb128 0x18
+ 1205 006d 9742     		.uleb128 0x2117
+ 1206 006f 19       		.uleb128 0x19
+ 1207 0070 01       		.uleb128 0x1
+ 1208 0071 13       		.uleb128 0x13
+ 1209 0072 00       		.byte	0
+ 1210 0073 00       		.byte	0
+ 1211 0074 09       		.uleb128 0x9
+ 1212 0075 34       		.uleb128 0x34
+ 1213 0076 00       		.byte	0
+ 1214 0077 03       		.uleb128 0x3
+ 1215 0078 0E       		.uleb128 0xe
+ 1216 0079 3A       		.uleb128 0x3a
+ 1217 007a 0B       		.uleb128 0xb
+ 1218 007b 3B       		.uleb128 0x3b
+ 1219 007c 0B       		.uleb128 0xb
+ 1220 007d 49       		.uleb128 0x49
+ 1221 007e 13       		.uleb128 0x13
+ 1222 007f 02       		.uleb128 0x2
+ 1223 0080 18       		.uleb128 0x18
+ 1224 0081 00       		.byte	0
+ 1225 0082 00       		.byte	0
+ 1226 0083 0A       		.uleb128 0xa
+ 1227 0084 34       		.uleb128 0x34
+ 1228 0085 00       		.byte	0
+ 1229 0086 03       		.uleb128 0x3
+ 1230 0087 0E       		.uleb128 0xe
+ 1231 0088 3A       		.uleb128 0x3a
+ 1232 0089 0B       		.uleb128 0xb
+ 1233 008a 3B       		.uleb128 0x3b
+ 1234 008b 0B       		.uleb128 0xb
+ 1235 008c 49       		.uleb128 0x49
+ 1236 008d 13       		.uleb128 0x13
+ 1237 008e 02       		.uleb128 0x2
+ 1238 008f 17       		.uleb128 0x17
+ 1239 0090 00       		.byte	0
+ 1240 0091 00       		.byte	0
+ 1241 0092 0B       		.uleb128 0xb
+ 1242 0093 0B       		.uleb128 0xb
+ 1243 0094 01       		.byte	0x1
+ 1244 0095 11       		.uleb128 0x11
+ 1245 0096 01       		.uleb128 0x1
+ 1246 0097 12       		.uleb128 0x12
+ 1247 0098 06       		.uleb128 0x6
+ 1248 0099 01       		.uleb128 0x1
+ 1249 009a 13       		.uleb128 0x13
+ 1250 009b 00       		.byte	0
+ 1251 009c 00       		.byte	0
+ 1252 009d 0C       		.uleb128 0xc
+ 1253 009e 34       		.uleb128 0x34
+ 1254 009f 00       		.byte	0
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 27
 
 
- 1278 0008 0100     		.2byte	0x1
- 1279 000a 50       		.byte	0x50
- 1280 000b 58000000 		.4byte	.LVL12
- 1281 000f 5A000000 		.4byte	.LVL13
- 1282 0013 0100     		.2byte	0x1
- 1283 0015 50       		.byte	0x50
- 1284 0016 7A000000 		.4byte	.LVL16
- 1285 001a 84000000 		.4byte	.LVL17
- 1286 001e 0100     		.2byte	0x1
- 1287 0020 50       		.byte	0x50
- 1288 0021 90000000 		.4byte	.LVL20
- 1289 0025 92000000 		.4byte	.LVL21
- 1290 0029 0100     		.2byte	0x1
- 1291 002b 50       		.byte	0x50
- 1292 002c A2000000 		.4byte	.LVL23
- 1293 0030 AC000000 		.4byte	.LVL24
- 1294 0034 0100     		.2byte	0x1
- 1295 0036 50       		.byte	0x50
- 1296 0037 B8000000 		.4byte	.LVL27
- 1297 003b BA000000 		.4byte	.LVL28
- 1298 003f 0100     		.2byte	0x1
- 1299 0041 50       		.byte	0x50
- 1300 0042 CA000000 		.4byte	.LVL30
- 1301 0046 D4000000 		.4byte	.LVL31
- 1302 004a 0100     		.2byte	0x1
- 1303 004c 50       		.byte	0x50
- 1304 004d E0000000 		.4byte	.LVL34
- 1305 0051 E2000000 		.4byte	.LVL35
- 1306 0055 0100     		.2byte	0x1
- 1307 0057 50       		.byte	0x50
- 1308 0058 02010000 		.4byte	.LVL38
- 1309 005c 0C010000 		.4byte	.LVL39
- 1310 0060 0100     		.2byte	0x1
- 1311 0062 50       		.byte	0x50
- 1312 0063 18010000 		.4byte	.LVL42
- 1313 0067 1A010000 		.4byte	.LVL43
- 1314 006b 0100     		.2byte	0x1
- 1315 006d 50       		.byte	0x50
- 1316 006e 2A010000 		.4byte	.LVL45
- 1317 0072 34010000 		.4byte	.LVL46
- 1318 0076 0100     		.2byte	0x1
- 1319 0078 50       		.byte	0x50
- 1320 0079 40010000 		.4byte	.LVL49
- 1321 007d 42010000 		.4byte	.LVL50
- 1322 0081 0100     		.2byte	0x1
- 1323 0083 50       		.byte	0x50
- 1324 0084 00000000 		.4byte	0
- 1325 0088 00000000 		.4byte	0
- 1326              	.LLST1:
- 1327 008c 14000000 		.4byte	.LVL2
- 1328 0090 18000000 		.4byte	.LVL3
- 1329 0094 0200     		.2byte	0x2
- 1330 0096 30       		.byte	0x30
- 1331 0097 9F       		.byte	0x9f
- 1332 0098 18000000 		.4byte	.LVL3
- 1333 009c 78010000 		.4byte	.LFE64
- 1334 00a0 0100     		.2byte	0x1
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 28
+ 1255 00a0 03       		.uleb128 0x3
+ 1256 00a1 08       		.uleb128 0x8
+ 1257 00a2 3A       		.uleb128 0x3a
+ 1258 00a3 0B       		.uleb128 0xb
+ 1259 00a4 3B       		.uleb128 0x3b
+ 1260 00a5 0B       		.uleb128 0xb
+ 1261 00a6 49       		.uleb128 0x49
+ 1262 00a7 13       		.uleb128 0x13
+ 1263 00a8 02       		.uleb128 0x2
+ 1264 00a9 17       		.uleb128 0x17
+ 1265 00aa 00       		.byte	0
+ 1266 00ab 00       		.byte	0
+ 1267 00ac 0D       		.uleb128 0xd
+ 1268 00ad 898201   		.uleb128 0x4109
+ 1269 00b0 01       		.byte	0x1
+ 1270 00b1 11       		.uleb128 0x11
+ 1271 00b2 01       		.uleb128 0x1
+ 1272 00b3 31       		.uleb128 0x31
+ 1273 00b4 13       		.uleb128 0x13
+ 1274 00b5 01       		.uleb128 0x1
+ 1275 00b6 13       		.uleb128 0x13
+ 1276 00b7 00       		.byte	0
+ 1277 00b8 00       		.byte	0
+ 1278 00b9 0E       		.uleb128 0xe
+ 1279 00ba 8A8201   		.uleb128 0x410a
+ 1280 00bd 00       		.byte	0
+ 1281 00be 02       		.uleb128 0x2
+ 1282 00bf 18       		.uleb128 0x18
+ 1283 00c0 9142     		.uleb128 0x2111
+ 1284 00c2 18       		.uleb128 0x18
+ 1285 00c3 00       		.byte	0
+ 1286 00c4 00       		.byte	0
+ 1287 00c5 0F       		.uleb128 0xf
+ 1288 00c6 898201   		.uleb128 0x4109
+ 1289 00c9 01       		.byte	0x1
+ 1290 00ca 11       		.uleb128 0x11
+ 1291 00cb 01       		.uleb128 0x1
+ 1292 00cc 31       		.uleb128 0x31
+ 1293 00cd 13       		.uleb128 0x13
+ 1294 00ce 00       		.byte	0
+ 1295 00cf 00       		.byte	0
+ 1296 00d0 10       		.uleb128 0x10
+ 1297 00d1 898201   		.uleb128 0x4109
+ 1298 00d4 00       		.byte	0
+ 1299 00d5 11       		.uleb128 0x11
+ 1300 00d6 01       		.uleb128 0x1
+ 1301 00d7 31       		.uleb128 0x31
+ 1302 00d8 13       		.uleb128 0x13
+ 1303 00d9 00       		.byte	0
+ 1304 00da 00       		.byte	0
+ 1305 00db 11       		.uleb128 0x11
+ 1306 00dc 01       		.uleb128 0x1
+ 1307 00dd 01       		.byte	0x1
+ 1308 00de 49       		.uleb128 0x49
+ 1309 00df 13       		.uleb128 0x13
+ 1310 00e0 01       		.uleb128 0x1
+ 1311 00e1 13       		.uleb128 0x13
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 28
 
 
- 1335 00a2 54       		.byte	0x54
- 1336 00a3 00000000 		.4byte	0
- 1337 00a7 00000000 		.4byte	0
- 1338              		.section	.debug_aranges,"",%progbits
- 1339 0000 1C000000 		.4byte	0x1c
- 1340 0004 0200     		.2byte	0x2
- 1341 0006 00000000 		.4byte	.Ldebug_info0
- 1342 000a 04       		.byte	0x4
- 1343 000b 00       		.byte	0
- 1344 000c 0000     		.2byte	0
- 1345 000e 0000     		.2byte	0
- 1346 0010 00000000 		.4byte	.LFB64
- 1347 0014 78010000 		.4byte	.LFE64-.LFB64
- 1348 0018 00000000 		.4byte	0
- 1349 001c 00000000 		.4byte	0
- 1350              		.section	.debug_ranges,"",%progbits
- 1351              	.Ldebug_ranges0:
- 1352 0000 00000000 		.4byte	.LFB64
- 1353 0004 78010000 		.4byte	.LFE64
- 1354 0008 00000000 		.4byte	0
- 1355 000c 00000000 		.4byte	0
- 1356              		.section	.debug_line,"",%progbits
- 1357              	.Ldebug_line0:
- 1358 0000 43020000 		.section	.debug_str,"MS",%progbits,1
- 1358      0200F001 
- 1358      00000201 
- 1358      FB0E0D00 
- 1358      01010101 
- 1359              	.LASF21:
- 1360 0000 6D657373 		.ascii	"message\000"
- 1360      61676500 
- 1361              	.LASF4:
- 1362 0008 5F5F7569 		.ascii	"__uint8_t\000"
- 1362      6E74385F 
- 1362      7400
- 1363              	.LASF25:
- 1364 0012 4932435F 		.ascii	"I2C_Peripheral_IsDeviceConnected\000"
- 1364      50657269 
- 1364      70686572 
- 1364      616C5F49 
- 1364      73446576 
- 1365              	.LASF5:
- 1366 0033 5F5F696E 		.ascii	"__int32_t\000"
- 1366      7433325F 
- 1366      7400
- 1367              	.LASF6:
- 1368 003d 6C6F6E67 		.ascii	"long int\000"
- 1368      20696E74 
- 1368      00
- 1369              	.LASF18:
- 1370 0046 4572726F 		.ascii	"ErrorCode\000"
- 1370      72436F64 
- 1370      6500
- 1371              	.LASF13:
- 1372 0050 666C6F61 		.ascii	"float\000"
- 1372      7400
- 1373              	.LASF1:
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 29
+ 1312 00e2 00       		.byte	0
+ 1313 00e3 00       		.byte	0
+ 1314 00e4 12       		.uleb128 0x12
+ 1315 00e5 21       		.uleb128 0x21
+ 1316 00e6 00       		.byte	0
+ 1317 00e7 49       		.uleb128 0x49
+ 1318 00e8 13       		.uleb128 0x13
+ 1319 00e9 2F       		.uleb128 0x2f
+ 1320 00ea 0B       		.uleb128 0xb
+ 1321 00eb 00       		.byte	0
+ 1322 00ec 00       		.byte	0
+ 1323 00ed 13       		.uleb128 0x13
+ 1324 00ee 34       		.uleb128 0x34
+ 1325 00ef 00       		.byte	0
+ 1326 00f0 03       		.uleb128 0x3
+ 1327 00f1 0E       		.uleb128 0xe
+ 1328 00f2 3A       		.uleb128 0x3a
+ 1329 00f3 0B       		.uleb128 0xb
+ 1330 00f4 3B       		.uleb128 0x3b
+ 1331 00f5 05       		.uleb128 0x5
+ 1332 00f6 49       		.uleb128 0x49
+ 1333 00f7 13       		.uleb128 0x13
+ 1334 00f8 3F       		.uleb128 0x3f
+ 1335 00f9 19       		.uleb128 0x19
+ 1336 00fa 3C       		.uleb128 0x3c
+ 1337 00fb 19       		.uleb128 0x19
+ 1338 00fc 00       		.byte	0
+ 1339 00fd 00       		.byte	0
+ 1340 00fe 14       		.uleb128 0x14
+ 1341 00ff 34       		.uleb128 0x34
+ 1342 0100 00       		.byte	0
+ 1343 0101 03       		.uleb128 0x3
+ 1344 0102 0E       		.uleb128 0xe
+ 1345 0103 3A       		.uleb128 0x3a
+ 1346 0104 0B       		.uleb128 0xb
+ 1347 0105 3B       		.uleb128 0x3b
+ 1348 0106 0B       		.uleb128 0xb
+ 1349 0107 49       		.uleb128 0x49
+ 1350 0108 13       		.uleb128 0x13
+ 1351 0109 3F       		.uleb128 0x3f
+ 1352 010a 19       		.uleb128 0x19
+ 1353 010b 3C       		.uleb128 0x3c
+ 1354 010c 19       		.uleb128 0x19
+ 1355 010d 00       		.byte	0
+ 1356 010e 00       		.byte	0
+ 1357 010f 15       		.uleb128 0x15
+ 1358 0110 2E       		.uleb128 0x2e
+ 1359 0111 00       		.byte	0
+ 1360 0112 3F       		.uleb128 0x3f
+ 1361 0113 19       		.uleb128 0x19
+ 1362 0114 3C       		.uleb128 0x3c
+ 1363 0115 19       		.uleb128 0x19
+ 1364 0116 6E       		.uleb128 0x6e
+ 1365 0117 0E       		.uleb128 0xe
+ 1366 0118 03       		.uleb128 0x3
+ 1367 0119 0E       		.uleb128 0xe
+ 1368 011a 3A       		.uleb128 0x3a
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 29
 
 
- 1374 0056 756E7369 		.ascii	"unsigned char\000"
- 1374      676E6564 
- 1374      20636861 
- 1374      7200
- 1375              	.LASF33:
- 1376 0064 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
- 1376      43313120 
- 1376      352E342E 
- 1376      31203230 
- 1376      31363036 
- 1377 0097 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
- 1377      20726576 
- 1377      6973696F 
- 1377      6E203233 
- 1377      37373135 
- 1378 00ca 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
- 1378      66756E63 
- 1378      74696F6E 
- 1378      2D736563 
- 1378      74696F6E 
- 1379              	.LASF7:
- 1380 00f2 6C6F6E67 		.ascii	"long unsigned int\000"
- 1380      20756E73 
- 1380      69676E65 
- 1380      6420696E 
- 1380      7400
- 1381              	.LASF3:
- 1382 0104 73686F72 		.ascii	"short unsigned int\000"
- 1382      7420756E 
- 1382      7369676E 
- 1382      65642069 
- 1382      6E7400
- 1383              	.LASF37:
- 1384 0117 49544D5F 		.ascii	"ITM_RxBuffer\000"
- 1384      52784275 
- 1384      66666572 
- 1384      00
- 1385              	.LASF14:
- 1386 0124 646F7562 		.ascii	"double\000"
- 1386      6C6500
- 1387              	.LASF27:
- 1388 012b 55415254 		.ascii	"UART_Debug_PutString\000"
- 1388      5F446562 
- 1388      75675F50 
- 1388      75745374 
- 1388      72696E67 
- 1389              	.LASF32:
- 1390 0140 4932435F 		.ascii	"I2C_Peripheral_WriteRegister\000"
- 1390      50657269 
- 1390      70686572 
- 1390      616C5F57 
- 1390      72697465 
- 1391              	.LASF36:
- 1392 015d 6D61696E 		.ascii	"main\000"
- 1392      00
- 1393              	.LASF23:
- 1394 0162 6374726C 		.ascii	"ctrl_reg1\000"
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 30
+ 1369 011b 0B       		.uleb128 0xb
+ 1370 011c 3B       		.uleb128 0x3b
+ 1371 011d 0B       		.uleb128 0xb
+ 1372 011e 00       		.byte	0
+ 1373 011f 00       		.byte	0
+ 1374 0120 00       		.byte	0
+ 1375              		.section	.debug_loc,"",%progbits
+ 1376              	.Ldebug_loc0:
+ 1377              	.LLST0:
+ 1378 0000 42000000 		.4byte	.LVL8
+ 1379 0004 4C000000 		.4byte	.LVL9
+ 1380 0008 0100     		.2byte	0x1
+ 1381 000a 50       		.byte	0x50
+ 1382 000b 58000000 		.4byte	.LVL12
+ 1383 000f 5A000000 		.4byte	.LVL13
+ 1384 0013 0100     		.2byte	0x1
+ 1385 0015 50       		.byte	0x50
+ 1386 0016 7A000000 		.4byte	.LVL16
+ 1387 001a 84000000 		.4byte	.LVL17
+ 1388 001e 0100     		.2byte	0x1
+ 1389 0020 50       		.byte	0x50
+ 1390 0021 90000000 		.4byte	.LVL20
+ 1391 0025 92000000 		.4byte	.LVL21
+ 1392 0029 0100     		.2byte	0x1
+ 1393 002b 50       		.byte	0x50
+ 1394 002c A2000000 		.4byte	.LVL23
+ 1395 0030 AC000000 		.4byte	.LVL24
+ 1396 0034 0100     		.2byte	0x1
+ 1397 0036 50       		.byte	0x50
+ 1398 0037 B8000000 		.4byte	.LVL27
+ 1399 003b BA000000 		.4byte	.LVL28
+ 1400 003f 0100     		.2byte	0x1
+ 1401 0041 50       		.byte	0x50
+ 1402 0042 CA000000 		.4byte	.LVL30
+ 1403 0046 D4000000 		.4byte	.LVL31
+ 1404 004a 0100     		.2byte	0x1
+ 1405 004c 50       		.byte	0x50
+ 1406 004d E0000000 		.4byte	.LVL34
+ 1407 0051 E2000000 		.4byte	.LVL35
+ 1408 0055 0100     		.2byte	0x1
+ 1409 0057 50       		.byte	0x50
+ 1410 0058 02010000 		.4byte	.LVL38
+ 1411 005c 0C010000 		.4byte	.LVL39
+ 1412 0060 0100     		.2byte	0x1
+ 1413 0062 50       		.byte	0x50
+ 1414 0063 18010000 		.4byte	.LVL42
+ 1415 0067 1A010000 		.4byte	.LVL43
+ 1416 006b 0100     		.2byte	0x1
+ 1417 006d 50       		.byte	0x50
+ 1418 006e 2A010000 		.4byte	.LVL45
+ 1419 0072 34010000 		.4byte	.LVL46
+ 1420 0076 0100     		.2byte	0x1
+ 1421 0078 50       		.byte	0x50
+ 1422 0079 40010000 		.4byte	.LVL49
+ 1423 007d 42010000 		.4byte	.LVL50
+ 1424 0081 0100     		.2byte	0x1
+ 1425 0083 50       		.byte	0x50
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 30
 
 
- 1394      5F726567 
- 1394      3100
- 1395              	.LASF24:
- 1396 016c 6374726C 		.ascii	"ctrl_reg4\000"
- 1396      5F726567 
- 1396      3400
- 1397              	.LASF10:
- 1398 0176 756E7369 		.ascii	"unsigned int\000"
- 1398      676E6564 
- 1398      20696E74 
- 1398      00
- 1399              	.LASF9:
- 1400 0183 6C6F6E67 		.ascii	"long long unsigned int\000"
- 1400      206C6F6E 
- 1400      6720756E 
- 1400      7369676E 
- 1400      65642069 
- 1401              	.LASF11:
- 1402 019a 75696E74 		.ascii	"uint8_t\000"
- 1402      385F7400 
- 1403              	.LASF35:
- 1404 01a2 433A5C55 		.ascii	"C:\\Users\\Beatrice Bonomi\\Desktop\\PSoC_03_Comple"
- 1404      73657273 
- 1404      5C426561 
- 1404      74726963 
- 1404      6520426F 
- 1405 01d1 74655C41 		.ascii	"te\\AY1920_II_HW_05_BONOMI_BEATRICE\\AY1920_II_HW_0"
- 1405      59313932 
- 1405      305F4949 
- 1405      5F48575F 
- 1405      30355F42 
- 1406 0202 355F5052 		.ascii	"5_PROJ_3.cydsn\000"
- 1406      4F4A5F33 
- 1406      2E637964 
- 1406      736E00
- 1407              	.LASF12:
- 1408 0211 696E7433 		.ascii	"int32_t\000"
- 1408      325F7400 
- 1409              	.LASF20:
- 1410 0219 73697A65 		.ascii	"sizetype\000"
- 1410      74797065 
- 1410      00
- 1411              	.LASF22:
- 1412 0222 6572726F 		.ascii	"error\000"
- 1412      7200
- 1413              	.LASF8:
- 1414 0228 6C6F6E67 		.ascii	"long long int\000"
- 1414      206C6F6E 
- 1414      6720696E 
- 1414      7400
- 1415              	.LASF29:
- 1416 0236 55415254 		.ascii	"UART_Debug_Start\000"
- 1416      5F446562 
- 1416      75675F53 
- 1416      74617274 
- 1416      00
- 1417              	.LASF34:
-ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccaduFcb.s 			page 31
+ 1426 0084 00000000 		.4byte	0
+ 1427 0088 00000000 		.4byte	0
+ 1428              	.LLST1:
+ 1429 008c 14000000 		.4byte	.LVL2
+ 1430 0090 18000000 		.4byte	.LVL3
+ 1431 0094 0200     		.2byte	0x2
+ 1432 0096 30       		.byte	0x30
+ 1433 0097 9F       		.byte	0x9f
+ 1434 0098 18000000 		.4byte	.LVL3
+ 1435 009c B0010000 		.4byte	.LFE64
+ 1436 00a0 0100     		.2byte	0x1
+ 1437 00a2 54       		.byte	0x54
+ 1438 00a3 00000000 		.4byte	0
+ 1439 00a7 00000000 		.4byte	0
+ 1440              		.section	.debug_aranges,"",%progbits
+ 1441 0000 1C000000 		.4byte	0x1c
+ 1442 0004 0200     		.2byte	0x2
+ 1443 0006 00000000 		.4byte	.Ldebug_info0
+ 1444 000a 04       		.byte	0x4
+ 1445 000b 00       		.byte	0
+ 1446 000c 0000     		.2byte	0
+ 1447 000e 0000     		.2byte	0
+ 1448 0010 00000000 		.4byte	.LFB64
+ 1449 0014 B0010000 		.4byte	.LFE64-.LFB64
+ 1450 0018 00000000 		.4byte	0
+ 1451 001c 00000000 		.4byte	0
+ 1452              		.section	.debug_ranges,"",%progbits
+ 1453              	.Ldebug_ranges0:
+ 1454 0000 00000000 		.4byte	.LFB64
+ 1455 0004 B0010000 		.4byte	.LFE64
+ 1456 0008 00000000 		.4byte	0
+ 1457 000c 00000000 		.4byte	0
+ 1458              		.section	.debug_line,"",%progbits
+ 1459              	.Ldebug_line0:
+ 1460 0000 7D020000 		.section	.debug_str,"MS",%progbits,1
+ 1460      02002102 
+ 1460      00000201 
+ 1460      FB0E0D00 
+ 1460      01010101 
+ 1461              	.LASF21:
+ 1462 0000 6D657373 		.ascii	"message\000"
+ 1462      61676500 
+ 1463              	.LASF4:
+ 1464 0008 5F5F7569 		.ascii	"__uint8_t\000"
+ 1464      6E74385F 
+ 1464      7400
+ 1465              	.LASF28:
+ 1466 0012 4932435F 		.ascii	"I2C_Peripheral_IsDeviceConnected\000"
+ 1466      50657269 
+ 1466      70686572 
+ 1466      616C5F49 
+ 1466      73446576 
+ 1467              	.LASF5:
+ 1468 0033 5F5F696E 		.ascii	"__int32_t\000"
+ 1468      7433325F 
+ 1468      7400
+ 1469              	.LASF6:
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 31
 
 
- 1418 0247 6D61696E 		.ascii	"main.c\000"
- 1418      2E6300
- 1419              	.LASF15:
- 1420 024e 63686172 		.ascii	"char\000"
- 1420      00
- 1421              	.LASF31:
- 1422 0253 4932435F 		.ascii	"I2C_Peripheral_ReadRegister\000"
- 1422      50657269 
- 1422      70686572 
- 1422      616C5F52 
- 1422      65616452 
- 1423              	.LASF2:
- 1424 026f 73686F72 		.ascii	"short int\000"
- 1424      7420696E 
- 1424      7400
- 1425              	.LASF16:
- 1426 0279 4E4F5F45 		.ascii	"NO_ERROR\000"
- 1426      52524F52 
- 1426      00
- 1427              	.LASF17:
- 1428 0282 4552524F 		.ascii	"ERROR\000"
- 1428      5200
- 1429              	.LASF19:
- 1430 0288 6C6F6E67 		.ascii	"long double\000"
- 1430      20646F75 
- 1430      626C6500 
- 1431              	.LASF0:
- 1432 0294 7369676E 		.ascii	"signed char\000"
- 1432      65642063 
- 1432      68617200 
- 1433              	.LASF26:
- 1434 02a0 73707269 		.ascii	"sprintf\000"
- 1434      6E746600 
- 1435              	.LASF30:
- 1436 02a8 43794465 		.ascii	"CyDelay\000"
- 1436      6C617900 
- 1437              	.LASF28:
- 1438 02b0 4932435F 		.ascii	"I2C_Peripheral_Start\000"
- 1438      50657269 
- 1438      70686572 
- 1438      616C5F53 
- 1438      74617274 
- 1439              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
+ 1470 003d 6C6F6E67 		.ascii	"long int\000"
+ 1470      20696E74 
+ 1470      00
+ 1471              	.LASF38:
+ 1472 0046 55415254 		.ascii	"UART_Debug_PutArray\000"
+ 1472      5F446562 
+ 1472      75675F50 
+ 1472      75744172 
+ 1472      72617900 
+ 1473              	.LASF18:
+ 1474 005a 4572726F 		.ascii	"ErrorCode\000"
+ 1474      72436F64 
+ 1474      6500
+ 1475              	.LASF13:
+ 1476 0064 666C6F61 		.ascii	"float\000"
+ 1476      7400
+ 1477              	.LASF1:
+ 1478 006a 756E7369 		.ascii	"unsigned char\000"
+ 1478      676E6564 
+ 1478      20636861 
+ 1478      7200
+ 1479              	.LASF39:
+ 1480 0078 474E5520 		.ascii	"GNU C11 5.4.1 20160609 (release) [ARM/embedded-5-br"
+ 1480      43313120 
+ 1480      352E342E 
+ 1480      31203230 
+ 1480      31363036 
+ 1481 00ab 616E6368 		.ascii	"anch revision 237715] -mcpu=cortex-m3 -mthumb -g -O"
+ 1481      20726576 
+ 1481      6973696F 
+ 1481      6E203233 
+ 1481      37373135 
+ 1482 00de 67202D66 		.ascii	"g -ffunction-sections -ffat-lto-objects\000"
+ 1482      66756E63 
+ 1482      74696F6E 
+ 1482      2D736563 
+ 1482      74696F6E 
+ 1483              	.LASF7:
+ 1484 0106 6C6F6E67 		.ascii	"long unsigned int\000"
+ 1484      20756E73 
+ 1484      69676E65 
+ 1484      6420696E 
+ 1484      7400
+ 1485              	.LASF3:
+ 1486 0118 73686F72 		.ascii	"short unsigned int\000"
+ 1486      7420756E 
+ 1486      7369676E 
+ 1486      65642069 
+ 1486      6E7400
+ 1487              	.LASF25:
+ 1488 012b 49544D5F 		.ascii	"ITM_RxBuffer\000"
+ 1488      52784275 
+ 1488      66666572 
+ 1488      00
+ 1489              	.LASF14:
+ 1490 0138 646F7562 		.ascii	"double\000"
+ 1490      6C6500
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 32
+
+
+ 1491              	.LASF30:
+ 1492 013f 55415254 		.ascii	"UART_Debug_PutString\000"
+ 1492      5F446562 
+ 1492      75675F50 
+ 1492      75745374 
+ 1492      72696E67 
+ 1493              	.LASF35:
+ 1494 0154 4932435F 		.ascii	"I2C_Peripheral_WriteRegister\000"
+ 1494      50657269 
+ 1494      70686572 
+ 1494      616C5F57 
+ 1494      72697465 
+ 1495              	.LASF42:
+ 1496 0171 6D61696E 		.ascii	"main\000"
+ 1496      00
+ 1497              	.LASF23:
+ 1498 0176 6374726C 		.ascii	"ctrl_reg1\000"
+ 1498      5F726567 
+ 1498      3100
+ 1499              	.LASF36:
+ 1500 0180 54696D65 		.ascii	"Timer_Start\000"
+ 1500      725F5374 
+ 1500      61727400 
+ 1501              	.LASF24:
+ 1502 018c 6374726C 		.ascii	"ctrl_reg4\000"
+ 1502      5F726567 
+ 1502      3400
+ 1503              	.LASF10:
+ 1504 0196 756E7369 		.ascii	"unsigned int\000"
+ 1504      676E6564 
+ 1504      20696E74 
+ 1504      00
+ 1505              	.LASF9:
+ 1506 01a3 6C6F6E67 		.ascii	"long long unsigned int\000"
+ 1506      206C6F6E 
+ 1506      6720756E 
+ 1506      7369676E 
+ 1506      65642069 
+ 1507              	.LASF11:
+ 1508 01ba 75696E74 		.ascii	"uint8_t\000"
+ 1508      385F7400 
+ 1509              	.LASF41:
+ 1510 01c2 433A5C55 		.ascii	"C:\\Users\\Beatrice Bonomi\\Desktop\\PSoC_03_Comple"
+ 1510      73657273 
+ 1510      5C426561 
+ 1510      74726963 
+ 1510      6520426F 
+ 1511 01f1 74655C41 		.ascii	"te\\AY1920_II_HW_05_BONOMI_BEATRICE\\AY1920_II_HW_0"
+ 1511      59313932 
+ 1511      305F4949 
+ 1511      5F48575F 
+ 1511      30355F42 
+ 1512 0222 355F5052 		.ascii	"5_PROJ_3.cydsn\000"
+ 1512      4F4A5F33 
+ 1512      2E637964 
+ 1512      736E00
+ 1513              	.LASF12:
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 33
+
+
+ 1514 0231 696E7433 		.ascii	"int32_t\000"
+ 1514      325F7400 
+ 1515              	.LASF20:
+ 1516 0239 73697A65 		.ascii	"sizetype\000"
+ 1516      74797065 
+ 1516      00
+ 1517              	.LASF37:
+ 1518 0242 54696D65 		.ascii	"Timer_isr_StartEx\000"
+ 1518      725F6973 
+ 1518      725F5374 
+ 1518      61727445 
+ 1518      7800
+ 1519              	.LASF22:
+ 1520 0254 6572726F 		.ascii	"error\000"
+ 1520      7200
+ 1521              	.LASF8:
+ 1522 025a 6C6F6E67 		.ascii	"long long int\000"
+ 1522      206C6F6E 
+ 1522      6720696E 
+ 1522      7400
+ 1523              	.LASF32:
+ 1524 0268 55415254 		.ascii	"UART_Debug_Start\000"
+ 1524      5F446562 
+ 1524      75675F53 
+ 1524      74617274 
+ 1524      00
+ 1525              	.LASF40:
+ 1526 0279 6D61696E 		.ascii	"main.c\000"
+ 1526      2E6300
+ 1527              	.LASF15:
+ 1528 0280 63686172 		.ascii	"char\000"
+ 1528      00
+ 1529              	.LASF34:
+ 1530 0285 4932435F 		.ascii	"I2C_Peripheral_ReadRegister\000"
+ 1530      50657269 
+ 1530      70686572 
+ 1530      616C5F52 
+ 1530      65616452 
+ 1531              	.LASF2:
+ 1532 02a1 73686F72 		.ascii	"short int\000"
+ 1532      7420696E 
+ 1532      7400
+ 1533              	.LASF27:
+ 1534 02ab 5061636B 		.ascii	"PacketReadyFlag\000"
+ 1534      65745265 
+ 1534      61647946 
+ 1534      6C616700 
+ 1535              	.LASF16:
+ 1536 02bb 4E4F5F45 		.ascii	"NO_ERROR\000"
+ 1536      52524F52 
+ 1536      00
+ 1537              	.LASF17:
+ 1538 02c4 4552524F 		.ascii	"ERROR\000"
+ 1538      5200
+ 1539              	.LASF26:
+ 1540 02ca 44617461 		.ascii	"DataBuffer\000"
+ 1540      42756666 
+ARM GAS  C:\Users\BEATRI~1\AppData\Local\Temp\ccCo02Yc.s 			page 34
+
+
+ 1540      657200
+ 1541              	.LASF19:
+ 1542 02d5 6C6F6E67 		.ascii	"long double\000"
+ 1542      20646F75 
+ 1542      626C6500 
+ 1543              	.LASF0:
+ 1544 02e1 7369676E 		.ascii	"signed char\000"
+ 1544      65642063 
+ 1544      68617200 
+ 1545              	.LASF29:
+ 1546 02ed 73707269 		.ascii	"sprintf\000"
+ 1546      6E746600 
+ 1547              	.LASF33:
+ 1548 02f5 43794465 		.ascii	"CyDelay\000"
+ 1548      6C617900 
+ 1549              	.LASF31:
+ 1550 02fd 4932435F 		.ascii	"I2C_Peripheral_Start\000"
+ 1550      50657269 
+ 1550      70686572 
+ 1550      616C5F53 
+ 1550      74617274 
+ 1551              		.ident	"GCC: (GNU Tools for ARM Embedded Processors) 5.4.1 20160609 (release) [ARM/embedded-5-bran
