@@ -10,6 +10,7 @@
 #include "project.h"
 #include "stdio.h"
 #include "registers.h"
+#include "InterruptRoutines.h"
 
 int main(void)
 {
@@ -149,6 +150,11 @@ int main(void)
             UART_Debug_PutString("Error occurred during I2C comm to read control register 4\r\n");   
         }
     }
+    
+    Timer_Start();
+
+    /* associate the interrupt to the correct ISR vector */
+    Timer_isr_StartEx(Custom_TIMER_ISR);
     
     for(;;)
     {
