@@ -72,6 +72,8 @@ void Packet_Preparation(void) {
 * \brief ISR on TC (every 10 ms):
 * \read the status register
 * \if bit 3 is set, read output data of all axis
+* \(function for multi register reading is used)
+* \(starting from the LOW register of X, the 6 data registers are read in a single read operation, since they have consecutive addresses)
 * \convert the data
 * \prepare the packet
 * \rise the flag to send the packet 

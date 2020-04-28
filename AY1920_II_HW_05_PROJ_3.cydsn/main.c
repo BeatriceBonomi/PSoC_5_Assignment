@@ -1,6 +1,10 @@
 /**
 * \brief Main source file for the I2C-Master project.
-*
+* \This project exploit I2C protocol for the communication between the PSOC5 microcontroller (master) 
+* \and the LIS3DH 3-Axis Accelerometer (slave). In the project, the accelerometer registers are properly
+* \configured to output 3 axis data in high resolution mode (12-bit resolution) at 100 Hz in the ±4g FSR.
+* \Data read from the sensor are converted in acceleration in m/s^2 and sent to the pc through UART communication protocol 
+* \(Data sent through UART have a precision of 3 decimals)
 * \author Beatrice Bonomi
 * \date april 28, 2020
 */

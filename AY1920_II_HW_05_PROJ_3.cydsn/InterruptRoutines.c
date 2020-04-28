@@ -65,6 +65,7 @@ void Data_Conversion(void) {
 /* 
 * \brief for each axis, starting from the acceleration in m/s^2:
 * \-cast to int32 after multiplying by 1000 to keep the first 3 decimals
+* \(In the bridge control panel the data will be then interpreted as int32 and plotted after scaling by a factor 0.001)
 * \-put the 4 bytes of the int32 in the correct position of the packet to be sent 
 */
 void Packet_Preparation(void) {
@@ -86,6 +87,8 @@ void Packet_Preparation(void) {
 * \brief ISR on TC (every 10 ms):
 * \read the status register
 * \if bit 3 is set, read output data of all axis
+* \(function for multi register reading is used)
+* \(starting from the LOW register of X, the 6 data registers are read in a single read operation, since they have consecutive addresses)
 * \convert the data
 * \prepare the packet
 * \rise the flag to send the packet 
