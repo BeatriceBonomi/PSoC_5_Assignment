@@ -26,7 +26,9 @@ volatile uint8_t PacketReadyFlag = 0;
 uint8_t DataBuffer[TRANSMIT_BUFFER_SIZE]; 
 
 /*
-* \brief for each axis, starting from left-adjusted LSB and MSB, create a right-justified 16-bit integer corresponding to the acceleration in mg
+* \brief for each axis, starting from left-adjusted LSB and MSB
+* \create a right-justified 16-bit integer corresponding to the acceleration in mg
+* \(sensitivity 4 mg/digit from the datasheet)
 */
 void Data_Conversion(void) {
     

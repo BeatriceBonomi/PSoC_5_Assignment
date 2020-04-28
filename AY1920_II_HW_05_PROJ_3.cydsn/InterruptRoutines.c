@@ -12,15 +12,38 @@
 /* number of bytes of data read from the slave device: LSB and MSB of X,Y and Z axis acceleration */
 #define DATA_BYTES_NUMBER 6
 
+#define CONVERSION_FACTOR_MG_TO_MS2 0.00981
+
 
 /* array to store accelerometer output data (starting from the position zero: LSB and MSB of X,Y and Z axis acceleration) */
-uint8_t accelerometer_data[6];
+uint8_t AccelerometerData[DATA_BYTES_NUMBER];
+
+/* array to store the 3 accelerations in mg (from the position zero: X axis, Y axis, Z axis) */
+int16_t Accelerations_mg[DATA_BYTES_NUMBER/2];
+
+/* array to store the 3 accelerations in m/s^2 (from the position zero: X axis, Y axis, Z axis) */
+float Accelerations_ms2[DATA_BYTES_NUMBER/2];
 
 /*Flag to start UART transmission in main*/
 volatile uint8_t PacketReadyFlag = 0; 
 
+/*
+* \brief for each axis, starting from left-adjusted LSB and MSB:
+* \-create a right-justified 16-bit integer corresponding to the acceleration in mg 
+* \(sensitivity 2 mg/digit from the datasheet)
+* \-create a float corresponding to the acceleration in m/s^2
+*/
 void Data_Conversion(void) {
-    //to define
+    
+    uint8_t i;
+    
+    for(i = 0; i < DATA_BYTES_NUMBER/2; i++) {
+        
+        /* right shift of 3 = right shift of 4 to get right-justified 12 bits + left shift of 1 to multiply by 2 and get the value in mg */
+        Accelerations_mg[i] = (int16)((AccelerometerData[i*2] | (AccelerometerData[i*2+1] << 8))) >> 3;
+        Accelerations_ms2[i] = ((float) Accelerations_mg[i]) * CONVERSION_FACTOR_MG_TO_MS2;
+    }
+
 }
 
 void Packet_Preparation(void) {
@@ -47,7 +70,7 @@ CY_ISR(Custom_TIMER_ISR) {
             error = I2C_Peripheral_ReadRegisterMulti( LIS3DH_DEVICE_ADDRESS,
                                                       OUT_X_L_ADDR,
                                                       6,
-                                                      accelerometer_data);
+                                                      AccelerometerData);
             if (error == NO_ERROR) {
                 Data_Conversion();
                 Packet_Preparation();
