@@ -6,15 +6,22 @@
 #include "InterruptRoutines.h"
 #include "registers.h"
 
+
 /* mask for bit 3 of the status register that is set when new data are available on all 3 axis */
 #define STATUS_REG_MASK 0x08 
 
 /* number of bytes of data read from the slave device: LSB and MSB of X,Y and Z axis acceleration */
 #define DATA_BYTES_NUMBER 6
 
+/* Sensitivity in the case of 10-bit resolution and ±2g FSR : 4 mg/digit (from the accelerometer datasheet) */
+#define SENSITIVITY 4
+
 
 /* array to store accelerometer output data (starting from the position zero: LSB and MSB of X,Y and Z axis acceleration) */
 uint8_t AccelerometerData[DATA_BYTES_NUMBER];
+
+/* array to store the 3 accelerations in digit(from the position zero: X axis, Y axis, Z axis) */
+int16_t Accelerations_digit[DATA_BYTES_NUMBER/2];
 
 /* array to store the 3 accelerations in mg (from the position zero: X axis, Y axis, Z axis */
 int16_t Accelerations_mg[DATA_BYTES_NUMBER/2];
@@ -23,12 +30,13 @@ int16_t Accelerations_mg[DATA_BYTES_NUMBER/2];
 volatile uint8_t PacketReadyFlag = 0; 
 
 /* Array of bytes to be trasmitted */
-uint8_t DataBuffer[TRANSMIT_BUFFER_SIZE]; 
+uint8_t DataBuffer[TRANSMIT_BUFFER_SIZE];
+
 
 /*
-* \brief for each axis, starting from left-adjusted LSB and MSB
-* \create a right-justified 16-bit integer corresponding to the acceleration in mg
-* \(sensitivity 4 mg/digit from the datasheet)
+* \brief for each axis, starting from left-adjusted LSB and MSB:
+* \-create a right-justified 16-bit integer corresponding to the acceleration in digit
+* \-convert the acceleration in digit to acceleration in mg
 */
 void Data_Conversion(void) {
     
@@ -36,9 +44,10 @@ void Data_Conversion(void) {
     
     for(i = 0; i < DATA_BYTES_NUMBER/2; i++) {
         
-        /* right shift of 4 = right shift of 6 to get right-justified 10 bits + left shift of 2 to multiply by 4 and get the value in mg */
-        Accelerations_mg[i] = (int16)((AccelerometerData[i*2] | (AccelerometerData[i*2+1] << 8))) >> 4;
-        
+        /* right shift of 6 to get right-justified 10 bits */
+        Accelerations_digit[i] = (int16)((AccelerometerData[i*2] | (AccelerometerData[i*2+1] << 8))) >> 6;
+        /* multiply by the sensitivity to get the acceleration in mg */
+        Accelerations_mg[i] = Accelerations_digit[i] * SENSITIVITY;
     }
 
 }
